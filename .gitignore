@@ -1,0 +1,9 @@
+*.iml
+.idea
+ls-api.iml
+target
+.settings
+.classpath
+.project
+node_modules
+logs
