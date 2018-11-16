@@ -47,7 +47,7 @@
     </properties>
 
     <dependencyManagement>
-        <!-- dependencies>
+        <dependencies>
             <dependency>
                 <groupId>me.snowdrop</groupId>
                 <artifactId>spring-boot-bom</artifactId>
@@ -55,7 +55,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-        </dependencies -->
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
