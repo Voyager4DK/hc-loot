@@ -1,0 +1,66 @@
+name: voyager4dk
+spec:
+  replicas: ${replicas}
+  template:
+    metadata:
+      labels:
+        group: dk.loej
+        project: voyager4dk-app
+        provider: fabric8
+    spec:
+      volumes:
+        - name: voyager4dk-app-properties
+          configMap:
+            name: voyager4dk-app-config-map
+      containers:
+      - name: voyager4dk-app
+        args:
+         - /usr/local/s2i/run
+         - " ${JAVA_OPTIONS} --spring.config.location=file:config/application.os.properties"
+         - "${appargs} "
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: managementhttp
+            containerPort: 8081
+            protocol: TCP
+          - name: prometheus
+            containerPort: 9779
+            protocol: TCP
+          - name: jolokia
+            containerPort: 8778
+            protocol: TCP
+        env:
+          - name: JAVA_OPTIONS
+            value: '-Djava.net.preferIPv4Stack=true -Dspring.profiles.active=os -Duser.timezone=Europe/Copenhagen'
+        resources:
+          requests:
+            cpu: 20m
+            memory: 256Mi
+          limits:
+            cpu: 900m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /admin/health
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 70
+          timeoutSeconds: 15
+          periodSeconds: 20
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /admin/health
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 15
+          periodSeconds: 25
+          successThreshold: 1
+          failureThreshold: 3
+        volumeMounts:
+          - name: voyager4dk-app-properties
+            mountPath: /deployments/config

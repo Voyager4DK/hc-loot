@@ -19,3 +19,8 @@ spec:
                    key: password
             - name: JAVA_OPTIONS
               value: "-Dspring.profiles.active=openshift"
+          resources:
+            requests:
+              memory: 200Mi
+            limits:
+              memory: 320Mi
