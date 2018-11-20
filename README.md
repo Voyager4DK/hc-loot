@@ -15,3 +15,7 @@ oc rollout status dc/hc-loot
 
 # Deploy db
 oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
+
+#Url:
+https://bit.ly/2BcYDYs
+http://hc-loot-voyager4dk.7e14.starter-us-west-2.openshiftapps.com/

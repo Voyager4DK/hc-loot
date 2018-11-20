@@ -45,7 +45,8 @@ public class LootItemController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public LootItem post(@RequestBody(required = false) LootItem lootItem) {
-        verifyCorrectPayload(lootItem);
+        System.out.println("saving lootItem = " + lootItem.getLootDate());
+    	verifyCorrectPayload(lootItem);
 
         return repository.save(lootItem);
     }

@@ -1,118 +1,4 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <title>Manage loot items</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css"/>
-    <link rel="shortcut icon" type="image/x-icon" href="image/Smile.png" />
-    <style>
-        input[type=number] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            -webkit-transition: .5s;
-            transition: .5s;
-            outline: 0;
-            font-family: 'Open Sans', serif;
-        }
-    </style>
-    <!-- Load AngularJS -->
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-    <script type="text/javascript">
-        var app = angular.module("LootItemManagement", []);
-
-        //Controller Part
-        app.controller("LootItemManagementController", function ($scope, $http) {
-
-            //Initialize page with default data which is blank in this example
-            $scope.lootItems = [];
-
-            $scope.form = {
-                id: -1,
-                name: ""
-            };
-
-            //Now load the data from server
-            _refreshPageData();
-
-            //HTTP POST/PUT methods for add/edit lootItems
-            $scope.update = function () {
-                var method = "";
-                var url = "";
-                var data = {};
-                if ($scope.form.id == -1) {
-                    //Id is absent so add lootItems - POST operation
-                    method = "POST";
-                    url = 'api/lootItems';
-                    data.name = $scope.form.name;
-                } else {
-                    //If Id is present, it's edit operation - PUT operation
-                    method = "PUT";
-                    url = 'api/loot_items/' + $scope.form.id;
-                    data.name = $scope.form.name;
-                }
-
-                $http({
-                    method: method,
-                    url: url,
-                    data: angular.toJson(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(_success, _error);
-            };
-
-            //HTTP DELETE- delete lootItem by id
-            $scope.remove = function (lootItem) {
-                $http({
-                    method: 'DELETE',
-                    url: 'api/loot_items/' + lootItem.id
-                }).then(_success, _error);
-            };
-
-            //In case of edit lootItems, populate form with lootItem data
-            $scope.edit = function (lootItem) {
-                $scope.form.name = lootItem.name;
-                $scope.form.id = lootItem.id;
-            };
-
-            /* Private Methods */
-            //HTTP GET- get all lootItems collection
-            function _refreshPageData() {
-                $http({
-                    method: 'GET',
-                    url: 'api/loot_items'
-                }).then(function successCallback(response) {
-                    $scope.lootItems = response.data;
-                }, function errorCallback(response) {
-                    console.log(response.statusText);
-                });
-            }
-
-            function _success(response) {
-                _refreshPageData();
-                _clearForm()
-            }
-
-            function _error(response) {
-                console.error(response.statusText);
-            }
-
-            //Clear the form
-            function _clearForm() {
-                $scope.form.name = "";
-                $scope.form.id = -1;
-            }
-        });
-    </script>
-</head>
-<body ng-app="LootItemManagement" ng-controller="LootItemManagementController">
-
-<div class="container">
+<div class="container" ng-controller="lootItemManagementCtrl">
     <h1>Manage loot items</h1>
     <p>
         TODO
@@ -120,25 +6,35 @@
 
     <h3>Add/Modify loot items</h3>
     <form ng-submit="update()">
+    	<div class="row">
+            <div class="col-6"><input type="text" placeholder="Row letter [A|B] & column number ex. A1" ng-model="form.rowAndNum" size="60"/></div>
+        </div>
         <div class="row">
             <div class="col-6"><input type="text" placeholder="Name" ng-model="form.name" size="60"/></div>
         </div>
+        <div class="row">
+            <div class="col-6">Loot date: <input type="date" placeholder="dd-MM-yyyy" ng-model="form.lootDate" min="01-11-2018" max="31-12-2019" required size="60"/></div>
+            <div role="alert">
+     			<span class="error" ng-show="form.lootDate.$error.required">Required!</span>
+     			<span class="error" ng-show="form.lootDate.$error.date">Not a valid date!</span>
+    		</div>
+        </div>
         <input type="submit" value="Save"/>
-        <select size="6" name="ngvalueselect" ng-model="data.model" multiple>
-      		<option ng-repeat="option in data.availableOptions" ng-value="option.value">{{option.name}}</option>
-    	</select>
+        
     </form>
 
-    <h3>Frugt liste</h3>
+    <h3>Loot item list</h3>
     <div class="row">
         <div class="col-2">Navn</div>
     </div>
     <div class="row" ng-repeat="lootItem in lootItems">
-        <div class="col-2">{{ lootItem.name }}</div>
+        <div class="col-2">{{ lootItem.rowAndNum }} {{ lootItem.name }}</div>
         <div class="col-8"><a ng-click="edit( lootItem )" class="btn">Modify</a> <a ng-click="remove( lootItem )" class="btn">Remove</a>
         </div>
     </div>
+    
+    <select size="6" name="ngvalueselect" ng-model="data.model" multiple>
+    	<option ng-repeat="option in data.availableOptions" ng-value="option.value">{{option.name}}</option>
+    	<option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">{{ lootItem.rowAndNum }} {{ lootItem.name }}</option>
+    </select>
 </div>
-
-</body>
-</html>

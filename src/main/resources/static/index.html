@@ -5,6 +5,9 @@
 <script src="js/controller.js"></script>
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>HC loot page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css"/>
     <link rel="shortcut icon" type="image/x-icon" href="image/Smile.png" />
@@ -28,9 +31,11 @@
 <body ng-app="mainApp">
 
 <div class="row" align="center" ng-show="loggedInPlayer">
-<a href="#!menu">Menu</a>
+<a href="#!main">Main</a>
 |
 <a href="#!managePlayers">Manage players</a>
+|
+<a href="#!manageLootItems">Manage loot items</a>
 </div>
 
 <div ng-view></div>

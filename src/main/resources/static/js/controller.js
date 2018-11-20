@@ -19,7 +19,15 @@ app.config(function($routeProvider) {
 				_goToLoginIfNotLoggedId($location, $rootScope);
 			}
 		},
-		templateUrl: 'managePlayers.html'			
+		templateUrl: 'managePlayers.html'
+	})
+	.when('/manageLootItems', {
+		resolve: {
+			"check": function($location, $rootScope) {
+				_goToLoginIfNotLoggedId($location, $rootScope);
+			}
+		},
+		templateUrl: 'manageLootItems.html'		
 	});	
 	
 	function _goToLoginIfNotLoggedId($location, $rootScope) {
@@ -202,5 +210,94 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
         $scope.form.lootEnabled = true;
         $scope.form.enabled = true;
         $scope.form.admin = false;
+    }
+});
+
+app.controller("lootItemManagementCtrl", function ($scope, $http) {
+
+    //Initialize page with default data which is blank in this example
+    $scope.lootItems = [];
+
+    $scope.form = {
+        id: -1,
+        name: ""
+    };
+
+    //Now load the data from server
+    _refreshPageData();
+
+    //HTTP POST/PUT methods for add/edit lootItems
+    $scope.update = function () {
+        var method = "";
+        var url = "";
+        var data = {};
+        if ($scope.form.id == -1) {
+            //Id is absent so add lootItems - POST operation
+            method = "POST";
+            url = 'api/loot_items';            
+        } else {
+            //If Id is present, it's edit operation - PUT operation
+            method = "PUT";
+            url = 'api/loot_items/' + $scope.form.id;
+        }
+        
+        data.rowAndNum = $scope.form.rowAndNum;
+        data.name = $scope.form.name;
+        data.lootDate = $scope.form.lootDate;
+
+        $http({
+            method: method,
+            url: url,
+            data: angular.toJson(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(_success, _error);
+    };
+
+    //HTTP DELETE- delete lootItem by id
+    $scope.remove = function (lootItem) {
+        $http({
+            method: 'DELETE',
+            url: 'api/loot_items/' + lootItem.id
+        }).then(_success, _error);
+    };
+
+    //In case of edit lootItems, populate form with lootItem data
+    $scope.edit = function (lootItem) {
+        $scope.form.rowAndNum = lootItem.rowAndNum;
+        $scope.form.name = lootItem.name;
+        $scope.form.lootDate = new Date(lootItem.lootDate);
+        $scope.form.id = lootItem.id;
+    };
+
+    /* Private Methods */
+    //HTTP GET- get all lootItems collection
+    function _refreshPageData() {
+        $http({
+            method: 'GET',
+            url: 'api/loot_items'
+        }).then(function successCallback(response) {
+            $scope.lootItems = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
+
+    function _success(response) {
+        _refreshPageData();
+        _clearForm()
+    }
+
+    function _error(response) {
+        console.error(response.statusText);
+    }
+
+    //Clear the form
+    function _clearForm() {
+        $scope.form.rowAndNum = "";
+        $scope.form.name = "";
+        $scope.form.lootDate = "";
+        $scope.form.id = -1;
     }
 });
