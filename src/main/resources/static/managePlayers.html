@@ -1,0 +1,39 @@
+<div class="container" ng-controller="playerManagementCtrl">
+    <h1>Player management</h1>
+    <p>
+        Manage players and if they can or want loot in this round. 
+    </p>
+
+    <h3>Add/Modify player</h3>
+    <form ng-submit="update()">
+        <div class="row">
+            <div class="col-6"><input type="text" placeholder="Name" ng-model="form.name" size="60"/></div>
+        </div>
+        <div class="row" ng-show="admin">
+            <div class="col-6"><input type="text" placeholder="Password" ng-model="form.password" size="60"/></div>
+        </div>
+        <div class="row">
+            <div class="col-6"><input type="text" placeholder="GloryPoints" ng-model="form.gloryPoints" size="60"/></div>
+        </div>
+        <div class="row">
+            <div class="col-6"><label><input type="checkbox" ng-model="form.lootEnabled"> Can get and want loot</label></div>
+        </div>
+        <div class="row">
+            <div class="col-6"><label><input type="checkbox" ng-show="admin" ng-model="form.enabled"> Player is enabled</label></div>
+        </div>
+        <div class="row" ng-show="admin">
+            <div class="col-6"><label><input type="checkbox" ng-model="form.admin"> Player is Admin</label></div>
+        </div>
+        <input type="submit" value="Save"/>
+    </form>
+
+    <h3>Player list</h3>
+    <div class="row">
+        <div class="col-2">Navn</div>
+    </div>
+    <div class="row" ng-repeat="player in players">
+        <div class="col-2">{{ player.name }}</div>
+        <div class="col-8"><a ng-click="edit( player )" class="btn">Edit</a> <a ng-show="admin" ng-click="remove( player )" class="btn">Remove</a>
+        </div>
+    </div>
+</div>

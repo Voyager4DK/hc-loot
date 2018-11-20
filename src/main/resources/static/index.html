@@ -1,5 +1,8 @@
 <!doctype html>
 <html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>        
+<script src="js/controller.js"></script>
 <head>
     <meta charset="utf-8"/>
     <title>Oles frugt liste</title>
@@ -20,123 +23,18 @@
             font-family: 'Open Sans', serif;
         }
     </style>
-    <!-- Load AngularJS -->
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-    <script type="text/javascript">
-        var app = angular.module("FruitManagement", []);
 
-        //Controller Part
-        app.controller("FruitManagementController", function ($scope, $http) {
-
-            //Initialize page with default data which is blank in this example
-            $scope.fruits = [];
-
-            $scope.form = {
-                id: -1,
-                name: ""
-            };
-
-            //Now load the data from server
-            _refreshPageData();
-
-            //HTTP POST/PUT methods for add/edit fruits
-            $scope.update = function () {
-                var method = "";
-                var url = "";
-                var data = {};
-                if ($scope.form.id == -1) {
-                    //Id is absent so add fruits - POST operation
-                    method = "POST";
-                    url = '/api/fruits';
-                    data.name = $scope.form.name;
-                } else {
-                    //If Id is present, it's edit operation - PUT operation
-                    method = "PUT";
-                    url = '/api/fruits/' + $scope.form.id;
-                    data.name = $scope.form.name;
-                }
-
-                $http({
-                    method: method,
-                    url: url,
-                    data: angular.toJson(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(_success, _error);
-            };
-
-            //HTTP DELETE- delete fruit by id
-            $scope.remove = function (fruit) {
-                $http({
-                    method: 'DELETE',
-                    url: '/api/fruits/' + fruit.id
-                }).then(_success, _error);
-            };
-
-            //In case of edit fruits, populate form with fruit data
-            $scope.edit = function (fruit) {
-                $scope.form.name = fruit.name;
-                $scope.form.id = fruit.id;
-            };
-
-            /* Private Methods */
-            //HTTP GET- get all fruits collection
-            function _refreshPageData() {
-                $http({
-                    method: 'GET',
-                    url: '/api/fruits'
-                }).then(function successCallback(response) {
-                    $scope.fruits = response.data;
-                }, function errorCallback(response) {
-                    console.log(response.statusText);
-                });
-            }
-
-            function _success(response) {
-                _refreshPageData();
-                _clearForm()
-            }
-
-            function _error(response) {
-                console.error(response.statusText);
-            }
-
-            //Clear the form
-            function _clearForm() {
-                $scope.form.name = "";
-                $scope.form.id = -1;
-            }
-        });
-    </script>
 </head>
-<body ng-app="FruitManagement" ng-controller="FruitManagementController">
+<body ng-app="mainApp">
 
-<div class="container">
-    <h1>Oles frugt app</h1>
-    <p>
-        Dette er en simpel Spring Boot application der k&oslash;rer p&aring; OpenShift og benytter en PosgreSQL database hvor man kan vedligeholde 
-        en liste af frugt.
-    </p>
+<a href="#!menu">Menu</a>
+|
+<a href="#!managePlayers">Manage players</a>
 
-    <h3>Tilf&oslash;j/rediger frugt</h3>
-    <form ng-submit="update()">
-        <div class="row">
-            <div class="col-6"><input type="text" placeholder="Name" ng-model="form.name" size="60"/></div>
-        </div>
-        <input type="submit" value="Save"/>
-    </form>
 
-    <h3>Frugt liste</h3>
-    <div class="row">
-        <div class="col-2">Navn</div>
-    </div>
-    <div class="row" ng-repeat="fruit in fruits">
-        <div class="col-2">{{ fruit.name }}</div>
-        <div class="col-8"><a ng-click="edit( fruit )" class="btn">Rediger</a> <a ng-click="remove( fruit )" class="btn">Slet</a>
-        </div>
-    </div>
-</div>
+<div ng-view></div>
+
+
 
 </body>
 </html>

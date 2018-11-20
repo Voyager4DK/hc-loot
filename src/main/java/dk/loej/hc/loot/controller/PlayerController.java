@@ -20,16 +20,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import dk.loej.hc.loot.entity.Fruit;
+import dk.loej.hc.loot.entity.Player;
 import dk.loej.hc.loot.repository.FruitRepository;
+import dk.loej.hc.loot.repository.PlayerRepository;
 
 @Controller
-@RequestMapping(value = "api/fruits")
-public class FruitController {
+@RequestMapping(value = "api/players")
+public class PlayerController {
 
-    private final FruitRepository repository;
+    private final PlayerRepository repository;
 
     @Autowired
-    public FruitController(FruitRepository repository) {
+    public PlayerController(PlayerRepository repository) {
         this.repository = repository;
     }
 
@@ -44,16 +46,16 @@ public class FruitController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit post(@RequestBody(required = false) Fruit fruit) {
-        verifyCorrectPayload(fruit);
+    public Player post(@RequestBody(required = false) Player player) {
+        verifyCorrectPayload(player);
 
-        return repository.save(fruit);
+        return repository.save(player);
     }
 
     @ResponseBody
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit get(@PathVariable("id") Integer id) {
-        verifyFruitExists(id);
+    public Player get(@PathVariable("id") Integer id) {
+        verifyPlayerExists(id);
 
         return repository.findOne(id);
     }
@@ -61,34 +63,34 @@ public class FruitController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit put(@PathVariable("id") Integer id, @RequestBody(required = false) Fruit fruit) {
-        verifyFruitExists(id);
-        verifyCorrectPayload(fruit);
+    public Player put(@PathVariable("id") Integer id, @RequestBody(required = false) Player player) {
+        verifyPlayerExists(id);
+        verifyCorrectPayload(player);
 
-        fruit.setId(id);
-        return repository.save(fruit);
+        player.setId(id);
+        return repository.save(player);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Integer id) {
-        verifyFruitExists(id);
+        verifyPlayerExists(id);
 
         repository.delete(id);
     }
 
-    private void verifyFruitExists(Integer id) {
+    private void verifyPlayerExists(Integer id) {
         if (!repository.exists(id)) {
-            throw new RuntimeException(String.format("Fruit with id=%d was not found", id));
+            throw new RuntimeException(String.format("Player with id=%d was not found", id));
         }
     }
 
-    private void verifyCorrectPayload(Fruit fruit) {
-        if (Objects.isNull(fruit)) {
-            throw new RuntimeException("Fruit cannot be null");
+    private void verifyCorrectPayload(Player player) {
+        if (Objects.isNull(player)) {
+            throw new RuntimeException("Player cannot be null");
         }
 
-        if (!Objects.isNull(fruit.getId())) {
+        if (!Objects.isNull(player.getId())) {
             throw new RuntimeException("Id field must be generated");
         }
     }

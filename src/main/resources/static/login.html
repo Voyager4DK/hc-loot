@@ -1,0 +1,24 @@
+<div class="container" width="50" ng-controller="loginCtrl">
+    <h1>Login</h1>
+    <p>
+        Get access to hc-loot by selecting your player <br>
+        and enter your password 
+    </p>
+
+    <form ng-submit="login()">
+    	<div class="row">
+	    	<div class="col-6">
+	        	<select ng-model="playerId" style="width: 100%">
+	  				<option ng-repeat="player in players" value="{{ player.id }}">{{ player.name }}</option>
+				</select>
+	        </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+            	<input type="password" placeholder="Password" ng-model="password" size="100%"/>
+            </div>
+        </div>
+        
+        <input type="submit" value="Login"/>
+    </form>
+</div>

@@ -19,17 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import dk.loej.hc.loot.entity.Fruit;
-import dk.loej.hc.loot.repository.FruitRepository;
+import dk.loej.hc.loot.entity.LootItem;
+import dk.loej.hc.loot.repository.LootItemRepository;
 
 @Controller
-@RequestMapping(value = "api/fruits")
-public class FruitController {
+@RequestMapping(value = "api/loot_items")
+public class LootItemController {
 
-    private final FruitRepository repository;
+    private final LootItemRepository repository;
 
     @Autowired
-    public FruitController(FruitRepository repository) {
+    public LootItemController(LootItemRepository repository) {
         this.repository = repository;
     }
 
@@ -44,16 +44,16 @@ public class FruitController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit post(@RequestBody(required = false) Fruit fruit) {
-        verifyCorrectPayload(fruit);
+    public LootItem post(@RequestBody(required = false) LootItem lootItem) {
+        verifyCorrectPayload(lootItem);
 
-        return repository.save(fruit);
+        return repository.save(lootItem);
     }
 
     @ResponseBody
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit get(@PathVariable("id") Integer id) {
-        verifyFruitExists(id);
+    public LootItem get(@PathVariable("id") Integer id) {
+        verifyLootItemExists(id);
 
         return repository.findOne(id);
     }
@@ -61,34 +61,34 @@ public class FruitController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Fruit put(@PathVariable("id") Integer id, @RequestBody(required = false) Fruit fruit) {
-        verifyFruitExists(id);
-        verifyCorrectPayload(fruit);
+    public LootItem put(@PathVariable("id") Integer id, @RequestBody(required = false) LootItem lootItem) {
+        verifyLootItemExists(id);
+        verifyCorrectPayload(lootItem);
 
-        fruit.setId(id);
-        return repository.save(fruit);
+        lootItem.setId(id);
+        return repository.save(lootItem);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Integer id) {
-        verifyFruitExists(id);
+        verifyLootItemExists(id);
 
         repository.delete(id);
     }
 
-    private void verifyFruitExists(Integer id) {
+    private void verifyLootItemExists(Integer id) {
         if (!repository.exists(id)) {
-            throw new RuntimeException(String.format("Fruit with id=%d was not found", id));
+            throw new RuntimeException(String.format("LootItem with id=%d was not found", id));
         }
     }
 
-    private void verifyCorrectPayload(Fruit fruit) {
-        if (Objects.isNull(fruit)) {
-            throw new RuntimeException("Fruit cannot be null");
+    private void verifyCorrectPayload(LootItem lootItem) {
+        if (Objects.isNull(lootItem)) {
+            throw new RuntimeException("LootItem cannot be null");
         }
 
-        if (!Objects.isNull(fruit.getId())) {
+        if (!Objects.isNull(lootItem.getId())) {
             throw new RuntimeException("Id field must be generated");
         }
     }
