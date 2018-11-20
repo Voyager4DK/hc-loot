@@ -5,7 +5,7 @@
 <script src="js/controller.js"></script>
 <head>
     <meta charset="utf-8"/>
-    <title>Oles frugt liste</title>
+    <title>HC loot page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css"/>
     <link rel="shortcut icon" type="image/x-icon" href="image/Smile.png" />
     <style>
@@ -27,13 +27,13 @@
 </head>
 <body ng-app="mainApp">
 
+<div class="row" align="center" ng-show="loggedInPlayer">
 <a href="#!menu">Menu</a>
 |
 <a href="#!managePlayers">Manage players</a>
-
+</div>
 
 <div ng-view></div>
-
 
 
 </body>

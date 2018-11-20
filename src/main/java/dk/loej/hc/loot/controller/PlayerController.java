@@ -38,8 +38,13 @@ public class PlayerController {
     @ResponseBody
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
+        Iterable<Player> players = repository.findAllByOrderByGloryPointsDesc();
+        for (Player player : players) {
+            player.setPassword(null);
+        }
+
         return StreamSupport
-                .stream(repository.findAll().spliterator(), false)
+                .stream(players.spliterator(), false)
                 .collect(Collectors.toList());
     }
 

@@ -5,13 +5,13 @@ app.config(function($routeProvider) {
 	.when('/', {
 		templateUrl: 'login.html'
 	})
-	.when('/menu', {
+	.when('/main', {
 		resolve: {
 			"check": function($location, $rootScope) {
 				_goToLoginIfNotLoggedId($location, $rootScope);
 			}
 		},
-		templateUrl: 'menu.html'
+		templateUrl: 'main.html'
 	})
 	.when('/managePlayers', {
 		resolve: {
@@ -66,9 +66,8 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope) {
             }		
         }).then(function successCallback(response) {
         	$rootScope.loggedInPlayer = response.data;        	
-        	console.log("Login success");
-        	$location.path("/menu");        	
-        	//window.location = "/index.html";
+        	console.log("Login success, window.location=" + window.location);
+        	$location.path("/main");
         }, function errorCallback(error, statusText) {
         	$rootScope.loggedInPlayer = null;
         	console.log("Login failed with error code: " + error.status); 
@@ -134,6 +133,9 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     
     //HTTP DELETE- delete player by id
     $scope.remove = function (player) {
+        if (!confirm("Are you sure..?")) {
+            return;
+        }
         $http({
             method: 'DELETE',
             url: 'api/players/' + player.id
@@ -144,11 +146,11 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     $scope.edit = function (player) {
         $scope.form.id = player.id;
         $scope.form.name = player.name;
-        $scope.form.password = player.password;
         $scope.form.gloryPoints = player.gloryPoints;
         $scope.form.lootEnabled = player.lootEnabled;
         $scope.form.enabled = player.enabled; 
         $scope.form.admin = player.admin;
+        _getPassword(player.id);
     };
 
     /* Private Methods */
@@ -159,11 +161,24 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     	} else {
     		$scope.admin = false;
     	}
+        $scope.playerId = $rootScope.loggedInPlayer.id;
         $http({
             method: 'GET',
             url: 'api/players'
         }).then(function successCallback(response) {
             $scope.players = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
+
+    function _getPassword(playerId) {
+        $http({
+            method: 'GET',
+            url: 'api/players/' + playerId
+        }).then(function successCallback(response) {
+            var player = response.data;
+            $scope.form.password = player.password;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
