@@ -1,10 +1,13 @@
 package dk.loej.hc.loot.controller;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import dk.loej.hc.loot.entity.LootItemProperties;
+import dk.loej.hc.loot.util.LootDateCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,8 +48,9 @@ public class LootItemController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public LootItem post(@RequestBody(required = false) LootItem lootItem) {
-        System.out.println("saving lootItem = " + lootItem.getLootDate());
-    	verifyCorrectPayload(lootItem);
+        verifyCorrectPayload(lootItem);
+
+        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getLastLootDate()));
 
         return repository.save(lootItem);
     }
@@ -66,6 +70,8 @@ public class LootItemController {
         verifyLootItemExists(id);
         verifyCorrectPayload(lootItem);
 
+        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getLastLootDate()));
+
         lootItem.setId(id);
         return repository.save(lootItem);
     }
@@ -76,6 +82,12 @@ public class LootItemController {
         verifyLootItemExists(id);
 
         repository.delete(id);
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/loot_item_properties", produces = MediaType.APPLICATION_JSON_VALUE)
+    public LootItemProperties getLootItemProperties() {
+        return LootDateCalculator.getLootItemProperties();
     }
 
     private void verifyLootItemExists(Integer id) {

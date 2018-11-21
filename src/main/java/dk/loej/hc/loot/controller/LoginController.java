@@ -30,8 +30,6 @@ public class LoginController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Player post(@RequestBody(required = true) LoginData loginData) throws LoginFailedException {
-    	System.out.println("playerId=" + loginData.getPlayerId() + ", password=" + loginData.getPassword());
-    	
     	Player player = repository.findOne(loginData.getPlayerId());
     	
     	if (loginData.getPassword().equals("undefined") && isEmpty(player.getPassword()) || loginData.getPassword().equals(player.getPassword()) ) {

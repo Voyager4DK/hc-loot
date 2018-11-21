@@ -1,7 +1,7 @@
 <div class="container" ng-controller="lootItemManagementCtrl">
     <h1>Manage loot items</h1>
     <p>
-        TODO
+        Add/modify loot items for Clan War that ended {{ lootItemProperties.lastLootDate }}.
     </p>
 
     <h3>Add/Modify loot items</h3>
@@ -10,31 +10,30 @@
             <div class="col-6"><input type="text" placeholder="Row letter [A|B] & column number ex. A1" ng-model="form.rowAndNum" size="60"/></div>
         </div>
         <div class="row">
-            <div class="col-6"><input type="text" placeholder="Name" ng-model="form.name" size="60"/></div>
+            <div class="col-6"><input type="text" placeholder="Name/Description" ng-model="form.name" size="60"/></div>
         </div>
         <div class="row">
-            <div class="col-6">Loot date: <input type="date" placeholder="dd-MM-yyyy" ng-model="form.lootDate" min="01-11-2018" max="31-12-2019" required size="60"/></div>
-            <div role="alert">
-     			<span class="error" ng-show="form.lootDate.$error.required">Required!</span>
-     			<span class="error" ng-show="form.lootDate.$error.date">Not a valid date!</span>
-    		</div>
+            <div class="col-6">Loot date: {{ lootItemProperties.lastLootDate }}</div>
         </div>
         <input type="submit" value="Save"/>
         
     </form>
 
     <h3>Loot item list</h3>
-    <div class="row">
+    <!-- div class="row">
         <div class="col-2">Navn</div>
     </div>
     <div class="row" ng-repeat="lootItem in lootItems">
         <div class="col-2">{{ lootItem.rowAndNum }} {{ lootItem.name }}</div>
         <div class="col-8"><a ng-click="edit( lootItem )" class="btn">Modify</a> <a ng-click="remove( lootItem )" class="btn">Remove</a>
         </div>
+    </div -->
+
+    <div class="row">
+        <select size="6" ng-model="selectedLootItemId" multiple>
+            <option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">{{ lootItem.rowAndNum }} {{ lootItem.name }}</option>
+        </select>
+        <a ng-click="edit()" class="btn">Modify</a>
+        <a ng-click="remove()" class="btn">Remove</a>
     </div>
-    
-    <select size="6" name="ngvalueselect" ng-model="data.model" multiple>
-    	<option ng-repeat="option in data.availableOptions" ng-value="option.value">{{option.name}}</option>
-    	<option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">{{ lootItem.rowAndNum }} {{ lootItem.name }}</option>
-    </select>
 </div>

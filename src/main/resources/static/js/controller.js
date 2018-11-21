@@ -243,7 +243,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
         
         data.rowAndNum = $scope.form.rowAndNum;
         data.name = $scope.form.name;
-        data.lootDate = $scope.form.lootDate;
+        //data.lootDate = $scope.lootItemProperties.lastLootDate;
 
         $http({
             method: method,
@@ -256,19 +256,35 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
     };
 
     //HTTP DELETE- delete lootItem by id
-    $scope.remove = function (lootItem) {
-        $http({
-            method: 'DELETE',
-            url: 'api/loot_items/' + lootItem.id
-        }).then(_success, _error);
+    $scope.remove = function () {
+        if ($scope.selectedLootItemId.constructor === Array) {
+            var ids = $scope.selectedLootItemId;
+            for (i = 0; i < ids.length; i++) {
+                _delete(ids[i]);
+            }
+        } else {
+            _delete($scope.selectedLootItemId);
+        }
     };
 
     //In case of edit lootItems, populate form with lootItem data
-    $scope.edit = function (lootItem) {
-        $scope.form.rowAndNum = lootItem.rowAndNum;
-        $scope.form.name = lootItem.name;
-        $scope.form.lootDate = new Date(lootItem.lootDate);
-        $scope.form.id = lootItem.id;
+    $scope.edit = function () {
+        if ($scope.selectedLootItemId.constructor === Array && $scope.selectedLootItemId.length > 1) {
+            return;
+        }
+
+        $http({
+            method: 'GET',
+            url: 'api/loot_items/' + $scope.selectedLootItemId
+        }).then(function successCallback(response) {
+            var lootItem = response.data;
+            $scope.form.id = lootItem.id;
+            $scope.form.rowAndNum = lootItem.rowAndNum;
+            $scope.form.name = lootItem.name;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+
     };
 
     /* Private Methods */
@@ -282,6 +298,22 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
+
+        $http({
+            method: 'GET',
+            url: 'api/loot_items/loot_item_properties'
+        }).then(function successCallback(response) {
+            $scope.lootItemProperties = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
+
+    function _delete(id) {
+        $http({
+            method: 'DELETE',
+            url: 'api/loot_items/' + id
+        }).then(_success, _error);
     }
 
     function _success(response) {
@@ -297,7 +329,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
     function _clearForm() {
         $scope.form.rowAndNum = "";
         $scope.form.name = "";
-        $scope.form.lootDate = "";
+        //$scope.form.lootDate = new Date($scope.lootItemProperties.lastLootDate);
         $scope.form.id = -1;
     }
 });
