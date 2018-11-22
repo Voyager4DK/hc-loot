@@ -51,7 +51,7 @@ public class LootItem {
 		return prioritySequence;
 	}
 
-	public void setPriotirySequence(int prioritySequence) {
+	public void setPrioritySequence(int prioritySequence) {
 		this.prioritySequence = prioritySequence;
 	}
 

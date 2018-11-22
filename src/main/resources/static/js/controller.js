@@ -234,30 +234,27 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
         if ($scope.form.id == -1) {
             //Id is absent so add lootItems - POST operation
             method = "POST";
-            url = 'api/loot_items';            
+            url = 'api/loot_items';
+            data.prioritySequence = $scope.lootItems.length+1;
         } else {
             //If Id is present, it's edit operation - PUT operation
             method = "PUT";
             url = 'api/loot_items/' + $scope.form.id;
+            data.prioritySequence = $scope.form.prioritySequence;
         }
         
         data.rowAndNum = $scope.form.rowAndNum;
-        data.name = $scope.form.name;
-        //data.lootDate = $scope.lootItemProperties.lastLootDate;
+        data.name = $scope.form.name;        
 
-        $http({
-            method: method,
-            url: url,
-            data: angular.toJson(data),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(_success, _error);
+        _update(method, url, data);
     };
 
     //HTTP DELETE- delete lootItem by id
     $scope.remove = function () {
-        if ($scope.selectedLootItemId.constructor === Array) {
+    	if (!confirm("Are you sure you want to delete that?")) {
+            return;
+        }
+    	if ($scope.selectedLootItemId.constructor === Array) {
             var ids = $scope.selectedLootItemId;
             for (i = 0; i < ids.length; i++) {
                 _delete(ids[i]);
@@ -270,7 +267,8 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
     //In case of edit lootItems, populate form with lootItem data
     $scope.edit = function () {
         if ($scope.selectedLootItemId.constructor === Array && $scope.selectedLootItemId.length > 1) {
-            return;
+            alert("You can only edit 1 item at a time");
+        	return;
         }
 
         $http({
@@ -281,10 +279,33 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             $scope.form.id = lootItem.id;
             $scope.form.rowAndNum = lootItem.rowAndNum;
             $scope.form.name = lootItem.name;
+            $scope.form.prioritySequence = lootItem.prioritySequence;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
 
+    };
+    
+    $scope.moveUp = function() {
+    	var ids = $scope.selectedLootItemId;
+        console.log("ids=" + ids);
+    	for (i = 0; i < ids.length; i++) {
+    		console.log("ids[" + i + "]=" + ids[i]);
+        	var method = "PUT";
+            var url = 'api/loot_items/' + ids[i] + "/change_sequence";
+            _update(method, url, -1)
+        }
+        _refreshPageData();
+    };
+    
+    $scope.moveDown = function() {
+    	var ids = $scope.selectedLootItemId;
+        for (i = 0; i < ids.length; i++) {        	
+        	var method = "PUT";
+            var url = 'api/loot_items/' + ids[i] + "/change_sequence";
+            _update(method, url, 1)
+        }
+        _refreshPageData();
     };
 
     /* Private Methods */
@@ -315,6 +336,17 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             url: 'api/loot_items/' + id
         }).then(_success, _error);
     }
+    
+    function _update(method, url, data) {
+    	$http({
+            method: method,
+            url: url,
+            data: angular.toJson(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(_success, _error);
+    }
 
     function _success(response) {
         _refreshPageData();
@@ -329,7 +361,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
     function _clearForm() {
         $scope.form.rowAndNum = "";
         $scope.form.name = "";
-        //$scope.form.lootDate = new Date($scope.lootItemProperties.lastLootDate);
+        $scope.form.prioritySequence = null;
         $scope.form.id = -1;
     }
 });

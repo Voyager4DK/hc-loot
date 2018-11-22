@@ -39,8 +39,9 @@ public class LootItemController {
     @ResponseBody
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
+    	Date lastLootDate = Date.valueOf(LootDateCalculator.getLastLootDate());
         return StreamSupport
-                .stream(repository.findAll().spliterator(), false)
+                .stream(repository.findByLootDateOrderByPrioritySequenceAsc(lastLootDate).spliterator(), false)
                 .collect(Collectors.toList());
     }
 
@@ -74,6 +75,27 @@ public class LootItemController {
 
         lootItem.setId(id);
         return repository.save(lootItem);
+    }
+    
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{id}/change_sequence", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public LootItem changeSequence(@PathVariable("id") Integer id, @RequestBody(required = false) Integer change) {
+        System.out.println("changeSequence, id=" + id + ", change=" + change);
+    	verifyLootItemExists(id);
+        LootItem lootItem = repository.findOne(id);
+        
+        lootItem.setPrioritySequence(lootItem.getPrioritySequence() + change);
+        
+        //TODO also update sequence of the lootItem that has the sequence now
+        
+        //TODO also check max value
+        if (lootItem.getPrioritySequence() > 0) {
+        	System.out.println("About to save sequence=" + lootItem.getPrioritySequence());
+        	return repository.save(lootItem);
+        } else {
+        	return repository.findOne(id);
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

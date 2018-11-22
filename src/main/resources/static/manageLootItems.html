@@ -19,20 +19,24 @@
         
     </form>
 
-    <h3>Loot item list</h3>
-    <!-- div class="row">
-        <div class="col-2">Navn</div>
-    </div>
-    <div class="row" ng-repeat="lootItem in lootItems">
-        <div class="col-2">{{ lootItem.rowAndNum }} {{ lootItem.name }}</div>
-        <div class="col-8"><a ng-click="edit( lootItem )" class="btn">Modify</a> <a ng-click="remove( lootItem )" class="btn">Remove</a>
-        </div>
-    </div -->
+    <h3>Loot item list</h3>    
 
+	<table>
+    	<tr>
+    		<td class="row">
+    			<select size="6" ng-model="selectedLootItemId" multiple>
+            		<option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">({{ lootItem.prioritySequence }}) {{ lootItem.rowAndNum }} {{ lootItem.name }} &nbsp;&nbsp;&nbsp;</option>
+        		</select>
+    		</td>
+    		<td>
+    			<a ng-click="moveUp()" class="btn">&uarr;</a><br><br><br>
+    			<a ng-click="moveDown()" class="btn">&darr;</a>
+    		</td>
+    	</tr>
+    </table>
+    <div>&nbsp;</div>
+    
     <div class="row">
-        <select size="6" ng-model="selectedLootItemId" multiple>
-            <option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">{{ lootItem.rowAndNum }} {{ lootItem.name }}</option>
-        </select>
         <a ng-click="edit()" class="btn">Modify</a>
         <a ng-click="remove()" class="btn">Remove</a>
     </div>
