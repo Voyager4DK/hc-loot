@@ -18,8 +18,10 @@ public class LootItem {
 	private String name;
     private int prioritySequence;
     private boolean original;
+    private boolean common;
     private int playerId;
     private Date lootDate;
+    
         
     public LootItem() {}
 
@@ -77,6 +79,14 @@ public class LootItem {
 
 	public void setLootDate(Date lootDate) {
 		this.lootDate = lootDate;
+	}
+
+	public boolean isCommon() {
+		return common;
+	}
+
+	public void setCommon(boolean common) {
+		this.common = common;
 	}
 
 }

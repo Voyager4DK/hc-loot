@@ -8,7 +8,7 @@
     <form ng-submit="login()">
     	<div class="row">
 	    	<div class="col-6">
-	        	<select ng-model="playerId" style="width: 100%">
+	        	<select  id="playerIdSelect" ng-model="playerId" style="width: 100%">
 	  				<option ng-repeat="player in players" value="{{ player.id }}">{{ player.name }}</option>
 				</select>
 	        </div>

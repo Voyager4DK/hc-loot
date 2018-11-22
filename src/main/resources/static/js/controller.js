@@ -42,7 +42,8 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope) {
     $scope.players = [];
 	
     //Now load the data from server
-    _refreshPageData();
+    _refreshPageData();   
+    
     
 	$scope.login = function() {
 		var loginData = {
@@ -110,24 +111,19 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
         if ($scope.form.id == -1) {
             //Id is absent so add players - POST operation
             method = "POST";
-            url = 'api/players';
-            data.name = $scope.form.name;
-            data.password = $scope.form.password;
-            data.gloryPoints = $scope.form.gloryPoints;
-            data.lootEnabled = $scope.form.lootEnabled;
-            data.enabled = $scope.form.enabled;
-            data.admin = $scope.form.admin;
+            url = 'api/players';            
         } else {
             //If Id is present, it's edit operation - PUT operation
             method = "PUT";
             url = 'api/players/' + $scope.form.id;
-            data.name = $scope.form.name;
-            data.password = $scope.form.password;
-            data.gloryPoints = $scope.form.gloryPoints;
-            data.lootEnabled = $scope.form.lootEnabled;
-            data.enabled = $scope.form.enabled;
-            data.admin = $scope.form.admin;
         }
+        
+        data.name = $scope.form.name;
+        data.password = $scope.form.password;
+        data.gloryPoints = $scope.form.gloryPoints;
+        data.lootEnabled = $scope.form.lootEnabled;
+        data.enabled = $scope.form.enabled;
+        data.admin = $scope.form.admin;
 
         $http({
             method: method,
@@ -220,7 +216,10 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
 
     $scope.form = {
         id: -1,
-        name: ""
+        rowAndNum: "",
+        name: "",
+        common: false,
+        prioritySequence: ($scope.lootItems.length+1)
     };
 
     //Now load the data from server
@@ -244,7 +243,8 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
         }
         
         data.rowAndNum = $scope.form.rowAndNum;
-        data.name = $scope.form.name;        
+        data.name = $scope.form.name;
+        data.common = $scope.form.common;
 
         _update(method, url, data);
     };
@@ -279,7 +279,8 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             $scope.form.id = lootItem.id;
             $scope.form.rowAndNum = lootItem.rowAndNum;
             $scope.form.name = lootItem.name;
-            $scope.form.prioritySequence = lootItem.prioritySequence;
+            $scope.form.common = lootItem.common;
+            $scope.form.prioritySequence = lootItem.prioritySequence;            
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
@@ -359,9 +360,10 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
 
     //Clear the form
     function _clearForm() {
-        $scope.form.rowAndNum = "";
+    	$scope.form.id = -1;
+    	$scope.form.rowAndNum = "";
         $scope.form.name = "";
-        $scope.form.prioritySequence = null;
-        $scope.form.id = -1;
+        $scope.form.common = false;
+        $scope.form.prioritySequence = null;        
     }
 });
