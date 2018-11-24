@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PlayerRepository extends CrudRepository<Player, Integer> {
     public List<Player> findAllByOrderByGloryPointsDesc();
+    
+    public List<Player> findByEnabledOrderByNameAsc(boolean enabled);
 }

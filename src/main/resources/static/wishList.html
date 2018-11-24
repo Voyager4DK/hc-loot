@@ -1,0 +1,37 @@
+<div class="container" ng-controller="wishListCtrl">
+    <h1 align="center">Loot Item wish list for {{loggedInPlayer.name}}</h1>
+    <p align="center">
+        For Clan war than ended on {{ lootItemProperties.lastLootDate }}.
+    </p>
+	<table align="center" ng-hide="lootDisabled">
+		<tr>
+			<th>&nbsp;</th>
+			<th>Yes please</th>
+			<th>&nbsp;</th>
+			<th>No thanks</th>
+		</tr>
+    	<tr>
+    		<td>
+    			<a ng-click="moveUp()" class="btn">&uarr;</a><br><br><br>
+    			<a ng-click="moveDown()" class="btn">&darr;</a>
+    		</td>
+    		<td class="row">
+    			<select size="6" ng-model="selectedEnabledLootItemId" multiple>
+            		<option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">({{ lootItem.prioritySequence }}) {{ lootItem.rowAndNum }} {{ lootItem.name }} &nbsp;&nbsp;&nbsp;</option>
+        		</select>
+    		</td>
+    		<td>
+    			<a ng-click="toggle(true)" class="btn">&rarr;</a><br><br><br>
+    			<a ng-click="toggle(false)" class="btn">&larr;</a>
+    		</td>
+    		<td class="row">
+    			<select size="6" ng-model="selectedDisabledLootItemId" multiple>
+            		<option ng-repeat="disabledLootItem in disabledLootItems" value="{{ disabledLootItem.id }}">({{ disabledLootItem.prioritySequence }}) {{ disabledLootItem.rowAndNum }} {{ disabledLootItem.name }} &nbsp;&nbsp;&nbsp;</option>
+        		</select>
+    		</td>
+    	</tr>
+    </table>
+    <div ng-show="lootDisabled" style="color:red" align="center">Loot is currently disabled for your player!</div>
+    
+   
+</div>

@@ -19,7 +19,8 @@ public class LootItem {
     private int prioritySequence;
     private boolean original;
     private boolean common;
-    private int playerId;
+    private boolean disabled;
+    private Integer playerId;
     private Date lootDate;
     
         
@@ -65,11 +66,11 @@ public class LootItem {
 		this.original = original;
 	}
 
-	public int getPlayerId() {
+	public Integer getPlayerId() {
 		return playerId;
 	}
 
-	public void setPlayerId(int playerId) {
+	public void setPlayerId(Integer playerId) {
 		this.playerId = playerId;
 	}
 
@@ -88,5 +89,13 @@ public class LootItem {
 	public void setCommon(boolean common) {
 		this.common = common;
 	}
+
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+	}	
 
 }

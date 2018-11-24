@@ -47,6 +47,19 @@ public class PlayerController {
                 .stream(players.spliterator(), false)
                 .collect(Collectors.toList());
     }
+    
+    @ResponseBody
+    @GetMapping(value = "/enabled", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List getAllEnabled() {
+        Iterable<Player> players = repository.findByEnabledOrderByNameAsc(true);
+        for (Player player : players) {
+            player.setPassword(null);
+        }
+
+        return StreamSupport
+                .stream(players.spliterator(), false)
+                .collect(Collectors.toList());
+    }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)

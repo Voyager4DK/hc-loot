@@ -32,7 +32,7 @@ public class LoginController {
     public Player post(@RequestBody(required = true) LoginData loginData) throws LoginFailedException {
     	Player player = repository.findOne(loginData.getPlayerId());
     	
-    	if (loginData.getPassword().equals("undefined") && isEmpty(player.getPassword()) || loginData.getPassword().equals(player.getPassword()) ) {
+    	if (player.isEnabled() && loginData.getPassword().equals("undefined") && isEmpty(player.getPassword()) || loginData.getPassword().equals(player.getPassword()) ) {
     		return player;
     	} else {
     		throw new LoginFailedException("Wrong password!");

@@ -1,12 +1,15 @@
 package dk.loej.hc.loot.controller;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import dk.loej.hc.loot.entity.LootItemProperties;
+import dk.loej.hc.loot.entity.Player;
 import dk.loej.hc.loot.util.LootDateCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,16 +27,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import dk.loej.hc.loot.entity.LootItem;
 import dk.loej.hc.loot.repository.LootItemRepository;
+import dk.loej.hc.loot.repository.PlayerRepository;
 
 @Controller
 @RequestMapping(value = "api/loot_items")
 public class LootItemController {
 
     private final LootItemRepository repository;
+    private final PlayerRepository playerRepository;
 
     @Autowired
-    public LootItemController(LootItemRepository repository) {
+    public LootItemController(LootItemRepository repository, PlayerRepository playerRepository) {
         this.repository = repository;
+        this.playerRepository = playerRepository;
     }
 
     @ResponseBody
@@ -41,11 +47,54 @@ public class LootItemController {
     public List getAll() {
     	Date lastLootDate = Date.valueOf(LootDateCalculator.getLastLootDate());
         return StreamSupport
-                .stream(repository.findByLootDateOrderByPrioritySequenceAsc(lastLootDate).spliterator(), false)
+                .stream(repository.findByLootDateAndOriginalOrderByPrioritySequenceAsc(lastLootDate, true).spliterator(), false)
                 .collect(Collectors.toList());
+    	/*return StreamSupport
+                .stream(repository.findByLootDateOrderByPrioritySequenceAsc(lastLootDate).spliterator(), false)
+                .collect(Collectors.toList());*/
+    }
+    
+    @ResponseBody
+    @GetMapping(value = "/for_player/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List getAllForPlayer(@PathVariable("playerId") Integer playerId) {
+    	Player player = playerRepository.findOne(playerId);
+    	//if () 
+    	
+    	Date lastLootDate = Date.valueOf(LootDateCalculator.getLastLootDate());
+        List items = getItemsForPlayer(playerId, lastLootDate);
+        
+        if (items == null || items.size() == 0) {
+        	items = copyOriginalItems(playerId, lastLootDate);
+        }
+        
+        return items;
     }
 
-    @ResponseBody
+	private List<LootItem> getItemsForPlayer(Integer playerId, Date lastLootDate) {
+		return StreamSupport
+                .stream(repository.findByLootDateAndPlayerIdAndOriginalOrderByPrioritySequenceAsc(lastLootDate, playerId, false).spliterator(), false)
+                .collect(Collectors.toList());
+	}
+
+    private List copyOriginalItems(Integer playerId, Date lastLootDate) {
+    	List<LootItem> originalItems = getAll();
+		List<LootItem> newItems =  new ArrayList<>();
+		for (LootItem lootItem : originalItems) {
+			LootItem newItem = new LootItem();
+			newItem.setRowAndNum(lootItem.getRowAndNum());
+			newItem.setName(lootItem.getName());
+			newItem.setPlayerId(playerId);
+			newItem.setLootDate(lastLootDate);
+			newItem.setPrioritySequence(lootItem.getPrioritySequence());
+			newItem.setOriginal(false);
+			newItem.setCommon(lootItem.isCommon());
+			newItem.setDisabled(false);
+			newItems.add(repository.save(lootItem));
+		}
+		return newItems;
+	}
+
+	@ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public LootItem post(@RequestBody(required = false) LootItem lootItem) {
@@ -80,9 +129,8 @@ public class LootItemController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}/change_sequence", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LootItem changeSequence(@PathVariable("id") Integer id, @RequestBody(required = false) Integer change) {
-        System.out.println("changeSequence, id=" + id + ", change=" + change);
-    	verifyLootItemExists(id);
+    public List changeSequence(@PathVariable("id") Integer id, @RequestBody(required = false) Integer change) {
+        verifyLootItemExists(id);
         LootItem lootItem = repository.findOne(id);
         
         lootItem.setPrioritySequence(lootItem.getPrioritySequence() + change);
@@ -91,11 +139,29 @@ public class LootItemController {
         
         //TODO also check max value
         if (lootItem.getPrioritySequence() > 0) {
-        	System.out.println("About to save sequence=" + lootItem.getPrioritySequence());
-        	return repository.save(lootItem);
+        	repository.save(lootItem);
+        } 
+        
+        if (lootItem.getPlayerId() == null) {
+        	return getAll();
         } else {
-        	return repository.findOne(id);
+        	return getAllForPlayer(lootItem.getPlayerId());
         }
+        
+    }
+    
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{id}/toggle", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List toggle(@PathVariable("id") Integer id, @RequestBody(required = false) boolean disabled) {
+        System.out.println("toggle, id=" + id + ", disabled=" + disabled);
+    	verifyLootItemExists(id);
+        LootItem lootItem = repository.findOne(id);        
+        lootItem.setDisabled(disabled);
+        
+        repository.save(lootItem);
+        
+        return getAllForPlayer(lootItem.getPlayerId());        
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
