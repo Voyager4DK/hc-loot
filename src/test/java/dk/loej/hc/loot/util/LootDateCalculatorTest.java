@@ -6,7 +6,7 @@ public class LootDateCalculatorTest {
 
     @Test
     public void doTest() {
-        System.out.println("lastLootDate=" + LootDateCalculator.getLastLootDate());
+        System.out.println("lastLootDate=" + LootDateCalculator.getCurrentLootDate());
         System.out.println("nextLootDate=" + LootDateCalculator.getNextLootDate());
     }
 }

@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import dk.loej.hc.loot.entity.Fruit;
 import dk.loej.hc.loot.entity.Player;
-import dk.loej.hc.loot.repository.FruitRepository;
 import dk.loej.hc.loot.repository.PlayerRepository;
 
 @Controller

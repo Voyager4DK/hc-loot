@@ -45,22 +45,18 @@ public class LootItemController {
     @ResponseBody
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
-    	Date lastLootDate = Date.valueOf(LootDateCalculator.getLastLootDate());
+    	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
         return StreamSupport
                 .stream(repository.findByLootDateAndOriginalOrderByPrioritySequenceAsc(lastLootDate, true).spliterator(), false)
                 .collect(Collectors.toList());
-    	/*return StreamSupport
-                .stream(repository.findByLootDateOrderByPrioritySequenceAsc(lastLootDate).spliterator(), false)
-                .collect(Collectors.toList());*/
     }
     
     @ResponseBody
     @GetMapping(value = "/for_player/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAllForPlayer(@PathVariable("playerId") Integer playerId) {
     	Player player = playerRepository.findOne(playerId);
-    	//if () 
-    	
-    	Date lastLootDate = Date.valueOf(LootDateCalculator.getLastLootDate());
+    	    	
+    	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
         List items = getItemsForPlayer(playerId, lastLootDate);
         
         if (items == null || items.size() == 0) {
@@ -68,6 +64,17 @@ public class LootItemController {
         }
         
         return items;
+    }
+    
+    @ResponseBody
+    @GetMapping(value = "/reset_player/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List resetPlayer(@PathVariable("playerId") Integer playerId) {
+    	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
+    	
+    	//delete all lootItems for this player for current lootDate
+    	repository.delete(repository.findByLootDateAndPlayerIdAndOriginalOrderByPrioritySequenceAsc(lastLootDate, playerId, false));
+        
+        return copyOriginalItems(playerId, lastLootDate);
     }
 
 	private List<LootItem> getItemsForPlayer(Integer playerId, Date lastLootDate) {
@@ -89,7 +96,7 @@ public class LootItemController {
 			newItem.setOriginal(false);
 			newItem.setCommon(lootItem.isCommon());
 			newItem.setDisabled(false);
-			newItems.add(repository.save(lootItem));
+			newItems.add(repository.save(newItem));
 		}
 		return newItems;
 	}
@@ -100,7 +107,7 @@ public class LootItemController {
     public LootItem post(@RequestBody(required = false) LootItem lootItem) {
         verifyCorrectPayload(lootItem);
 
-        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getLastLootDate()));
+        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getCurrentLootDate()));
 
         return repository.save(lootItem);
     }
@@ -120,7 +127,7 @@ public class LootItemController {
         verifyLootItemExists(id);
         verifyCorrectPayload(lootItem);
 
-        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getLastLootDate()));
+        lootItem.setLootDate(Date.valueOf(LootDateCalculator.getCurrentLootDate()));
 
         lootItem.setId(id);
         return repository.save(lootItem);
@@ -135,11 +142,10 @@ public class LootItemController {
         
         lootItem.setPrioritySequence(lootItem.getPrioritySequence() + change);
         
-        //TODO also update sequence of the lootItem that has the sequence now
-        
         //TODO also check max value
         if (lootItem.getPrioritySequence() > 0) {
-        	repository.save(lootItem);
+        	updateLootItemWithSameSequence(change, lootItem);
+        	repository.save(lootItem);        	
         } 
         
         if (lootItem.getPlayerId() == null) {
@@ -149,6 +155,16 @@ public class LootItemController {
         }
         
     }
+
+	private void updateLootItemWithSameSequence(Integer change, LootItem lootItem) {
+		List<LootItem> lootItemsWithSameSequence = repository.findByLootDateAndPlayerIdAndOriginalAndPrioritySequence(lootItem.getLootDate(), lootItem.getPlayerId(), false, lootItem.getPrioritySequence());
+		if (!lootItemsWithSameSequence.isEmpty()) {
+			for (LootItem lootItemWithSameSeq : lootItemsWithSameSequence) {
+				lootItemWithSameSeq.setPrioritySequence(lootItemWithSameSeq.getPrioritySequence() - change);
+				repository.save(lootItemWithSameSeq);
+			}
+		}
+	}
     
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)

@@ -19,13 +19,17 @@ public final class LootDateCalculator {
         return nextLootDate;
     }
 
-    public static LocalDate getLastLootDate() {
+    public static LocalDate getCurrentLootDate() {
         return getNextLootDate().minusDays(interval);
+    }
+    
+    public static LocalDate getPreviousLootDate() {
+        return getCurrentLootDate().minusDays(interval);
     }
 
     public static LootItemProperties getLootItemProperties() {
         LootItemProperties lootItemProperties = new LootItemProperties();
-        lootItemProperties.setLastLootDate(getLastLootDate());
+        lootItemProperties.setLastLootDate(getCurrentLootDate());
         lootItemProperties.setNextLootDate(getNextLootDate());
         return lootItemProperties;
     }

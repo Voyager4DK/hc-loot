@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import dk.loej.hc.loot.entity.Fruit;
-import dk.loej.hc.loot.repository.FruitRepository;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -20,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApplicationTest {
 
-    @Autowired
+    /*@Autowired
     private FruitRepository fruitRepository;
 
     @Before
@@ -61,5 +58,5 @@ public class ApplicationTest {
     @Test
     public void getWrongId() {
       assertTrue(fruitRepository.findOne(9999)==null);
-    }
+    }*/
 }

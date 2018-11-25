@@ -35,7 +35,23 @@ app.config(function($routeProvider) {
 				_goToLoginIfNotLoggedId($location, $rootScope);
 			}
 		},
-		templateUrl: 'wishList.html'		
+		templateUrl: 'wishList.html'
+	})
+	.when('/results', {
+		resolve: {
+			"check": function($location, $rootScope) {
+				_goToLoginIfNotLoggedId($location, $rootScope);
+			}
+		},
+		templateUrl: 'results.html'
+	})
+	.when('/comments', {
+		resolve: {
+			"check": function($location, $rootScope) {
+				_goToLoginIfNotLoggedId($location, $rootScope);
+			}
+		},
+		templateUrl: 'comments.html'		
 	});	
 	
 	function _goToLoginIfNotLoggedId($location, $rootScope) {
@@ -390,8 +406,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
     
     $scope.moveUp = function() {
     	var ids = $scope.selectedEnabledLootItemId;
-        console.log("ids=" + ids);
-    	for (i = 0; i < ids.length; i++) {
+        for (i = 0; i < ids.length; i++) {
     		console.log("ids[" + i + "]=" + ids[i]);
         	if (ids[i].length > 0) {
         		var method = "PUT";
@@ -399,7 +414,6 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         		_update(method, url, -1);
         	}
         }
-        // _refreshPageData();
     };
     
     $scope.moveDown = function() {
@@ -409,7 +423,6 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
             _update(method, url, 1)
         }
-        // _refreshPageData();
     };
     
     $scope.toggle = function(disabled) {
@@ -424,7 +437,19 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         }
     };
     
-    
+    $scope.reset = function() {
+    	if (!confirm("Are you sure you want to reset your wish list and reload loot items?")) {
+            return;
+        }
+    	$http({
+            method: 'GET',
+            url: 'api/loot_items/reset_player/' + $rootScope.loggedInPlayer.id
+        }).then(function successCallback(response) {
+        	_splitLootItemData(response.data);
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }    
 
     /* Private Methods */
     // HTTP GET- get all lootItems collection
@@ -478,5 +503,37 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
 
     function _error(response) {
         console.error(response.statusText);
+    }
+});
+
+app.controller("resultsCtrl", function ($scope, $http, $rootScope) {
+
+	_refreshPageData();
+	
+	function _refreshPageData() {  	
+    	$http({
+            method: 'GET',
+            url: 'api/loot_items/loot_item_properties'
+        }).then(function successCallback(response) {
+            $scope.lootItemProperties = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
+});	
+
+app.controller("commentsCtrl", function ($scope, $http, $rootScope) {
+
+	_refreshPageData();
+	
+	function _refreshPageData() {  	
+    	$http({
+            method: 'GET',
+            url: 'api/loot_items/loot_item_properties'
+        }).then(function successCallback(response) {
+            $scope.lootItemProperties = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
     }
 });
