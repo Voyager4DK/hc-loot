@@ -11,16 +11,16 @@ public final class LootDateCalculator {
     private LootDateCalculator() {}
 
     public static LocalDate getNextLootDate() {
-        LocalDate now = LocalDate.now();
+    	return getCurrentLootDate().plusDays(interval);
+    }
+
+    public static LocalDate getCurrentLootDate() {
+    	LocalDate now = LocalDate.now();
         LocalDate nextLootDate = startDate;
         while (nextLootDate.isBefore(now)) {
             nextLootDate = nextLootDate.plusDays(interval);
         }
         return nextLootDate;
-    }
-
-    public static LocalDate getCurrentLootDate() {
-        return getNextLootDate().minusDays(interval);
     }
     
     public static LocalDate getPreviousLootDate() {

@@ -24,6 +24,10 @@ public interface LootItemRepository extends CrudRepository<LootItem, Integer> {
 	@Query("select l from LootItem l where l.lootDate = :lootDate and l.playerId = :playerId and l.original = :original order by prioritySequence asc")
     Stream<LootItem> findByLootDateAndPlayerIdAndOriginalOrderByPrioritySequenceAscReturnStream(@Param("lootDate") Date lootDate, @Param("playerId") Integer playerId, @Param("original") boolean original);
 	
+	public List<LootItem> findByLootDateAndPlayerIdAndDisabledOrderByPrioritySequenceAsc(Date lootDate, Integer playerId, boolean enabled);
+	@Query("select l from LootItem l where l.lootDate = :lootDate and l.playerId = :playerId and l.disabled = :disabled order by prioritySequence asc")
+    Stream<LootItem> findByLootDateAndPlayerIdAndDisabledOrderByPrioritySequenceAscReturnStream(@Param("lootDate") Date lootDate, @Param("playerId") Integer playerId, @Param("disabled") boolean disabled);
+	
 	public List<LootItem> findByLootDateAndPlayerIdAndOriginalAndPrioritySequence(Date lootDate, Integer playerId, boolean original, int prioritySequence);
 	@Query("select l from LootItem l where l.lootDate = :lootDate and l.playerId = :playerId and l.original = :original and prioritySequence = :prioritySequence")
     Stream<LootItem> findByLootDateAndPlayerIdAndOriginalAndAndPrioritySequenceReturnStream(@Param("lootDate") Date lootDate, @Param("playerId") Integer playerId, @Param("original") boolean original, @Param("prioritySequence") int prioritySequence);

@@ -1,6 +1,24 @@
 <div class="container" ng-controller="resultsCtrl">
-<h1 align="center">Loot item distribution result for {{ lootItemProperties.lastLootDate }}</h1>
-    <p align="center">
-        Is still under construction!
-    </p>
+	<h1 align="center">Loot item distribution result for <br>
+	{{ lootItemProperties.lastLootDate }}</h1>
+        
+    <div align="center"><a ng-show="admin" ng-click="distributeLoot()" class="btn">Distribute loot</a></div>
+    
+    <div>&nbsp;</div>
+    
+    <table align="center">
+    	<tr>
+    		<th align="left">#</th>
+    		<th align="left">Player</th>
+    		<th align="left">Glory Poins</th>
+    		<th align="left">Loot item</th>
+    	</tr>
+    	<tr ng-repeat="result in results">
+    		<td>{{ result.orderSequence }}.</td>
+    		<td>{{ result.player.name }}&nbsp;&nbsp;</td>
+    		<td align="right">{{ result.gloryPoints }}&nbsp;&nbsp;</td>
+    		<td>{{ result.lootItem.rowAndNum }} {{ result.lootItem.name }}</td>
+    	</tr>
+    </table>
+    
 </div>

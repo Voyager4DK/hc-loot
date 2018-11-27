@@ -37,6 +37,15 @@
     		<td>&nbsp;</td>
     	</tr>
     </table>
+    <br>
+    <table align="center" ng-hide="lootDisabled">
+    	<tr>
+    		<td>
+    			<div align="left" ng-repeat="lootItem in lootItems">{{ lootItem.prioritySequence }}. {{ lootItem.rowAndNum }} {{ lootItem.name }} </div>
+    		</td>
+    	</tr>
+    </table>
+    
     <div ng-show="lootDisabled" style="color:red" align="center">Loot is currently disabled for your player!</div>
     
    

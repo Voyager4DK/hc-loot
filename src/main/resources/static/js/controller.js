@@ -510,7 +510,36 @@ app.controller("resultsCtrl", function ($scope, $http, $rootScope) {
 
 	_refreshPageData();
 	
-	function _refreshPageData() {  	
+	$scope.distributeLoot = function() {
+    	if (!confirm("Are you sure you want to distribute loot?")) {
+            return;
+        }
+    	$http({
+            method: 'GET',
+            url: 'api/result/distribute'
+        }).then(function successCallback(response) {
+        	$scope.results = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
+	
+	
+	function _refreshPageData() {
+		if ($rootScope.loggedInPlayer.admin) {
+    		$scope.admin = true;
+    	} else {
+    		$scope.admin = false;
+    	}
+		$http({
+            method: 'GET',
+            url: 'api/result'
+        }).then(function successCallback(response) {
+            $scope.results = response.data;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+		
     	$http({
             method: 'GET',
             url: 'api/loot_items/loot_item_properties'
