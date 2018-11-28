@@ -268,6 +268,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
         data.rowAndNum = $scope.form.rowAndNum;
         data.name = $scope.form.name;
         data.common = $scope.form.common;
+        data.original = true;
 
         _update(method, url, data);
     };

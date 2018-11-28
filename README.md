@@ -20,6 +20,8 @@ oc rollout status dc/hc-loot
 
 # Connect to db
 	psql postgresql://${MY_DATABASE_SERVICE_HOST}:${MY_DATABASE_SERVICE_PORT}/my_data -U luke -c "SELECT * FROM player"
+	
+	psql postgresql://${MY_DATABASE_SERVICE_HOST}:${MY_DATABASE_SERVICE_PORT}/my_data -U luke -c "SELECT distinct player_id from loot_item where loot_date='2018-11-27'"
 
 #Url:
 	https://bit.ly/2BcYDYs

@@ -10,27 +10,35 @@ public final class LootDateCalculator {
 
     private LootDateCalculator() {}
 
-    public static LocalDate getNextLootDate() {
-    	return getCurrentLootDate().plusDays(interval);
-    }
-
-    public static LocalDate getCurrentLootDate() {
-    	LocalDate now = LocalDate.now();
+    public static LocalDate getNextLootDate(LocalDate now) {
         LocalDate nextLootDate = startDate;
-        while (nextLootDate.isBefore(now)) {
+        while (nextLootDate.isBefore(now) || nextLootDate.isEqual(now)) {
             nextLootDate = nextLootDate.plusDays(interval);
         }
         return nextLootDate;
     }
+
+    public static LocalDate getCurrentLootDate() {
+        return getCurrentLootDate(LocalDate.now());
+    }
+    
+    public static LocalDate getCurrentLootDate(LocalDate now) {
+        return getNextLootDate(now).minusDays(interval);
+    }
+    
+    public static LocalDate getPreviousLootDate(LocalDate now) {
+        return getCurrentLootDate(now).minusDays(interval);
+    }
     
     public static LocalDate getPreviousLootDate() {
-        return getCurrentLootDate().minusDays(interval);
+        return getPreviousLootDate(LocalDate.now());
     }
 
     public static LootItemProperties getLootItemProperties() {
-        LootItemProperties lootItemProperties = new LootItemProperties();
-        lootItemProperties.setLastLootDate(getCurrentLootDate());
-        lootItemProperties.setNextLootDate(getNextLootDate());
+    	LocalDate now = LocalDate.now();
+    	LootItemProperties lootItemProperties = new LootItemProperties();
+        lootItemProperties.setLastLootDate(getCurrentLootDate(now));
+        lootItemProperties.setNextLootDate(getNextLootDate(now));
         return lootItemProperties;
     }
 }
