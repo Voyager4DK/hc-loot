@@ -21,6 +21,6 @@ spec:
               value: "-Dspring.profiles.active=openshift"
           resources:
             requests:
-              memory: 200Mi
-            limits:
               memory: 320Mi
+            limits:
+              memory: 640Mi

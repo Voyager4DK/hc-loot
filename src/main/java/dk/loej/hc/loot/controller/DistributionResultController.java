@@ -60,12 +60,11 @@ public class DistributionResultController {
         
         List<Player> players = playerRepository.findByEnabledAndLootEnabledOrderByGloryPointsDesc(true, true);
         int i = 0;
-        int resultIndex = 1;
         while (!lootItemMap.isEmpty()) {
         	List<LootItem> wishList = getWishList(players.get(i).getId(), lastLootDate);
         	for (LootItem wish : wishList) {
 				if (lootItemMap.containsKey(wish.getRowAndNum())) {
-					distributionResults.add(createDistributionResult(wish, players.get(i), lastLootDate, resultIndex));
+					distributionResults.add(createDistributionResult(wish, players.get(i), lastLootDate, distributionResults.size()+1));
 					lootItemMap.remove(wish.getRowAndNum());
 					break;
 				}
@@ -73,8 +72,7 @@ public class DistributionResultController {
         	i++;
         	if (i == players.size()) {
         		i = 0;
-        	}
-        	resultIndex++;
+        	}        	
         }
         distributionResultRepository.save(distributionResults);
     	

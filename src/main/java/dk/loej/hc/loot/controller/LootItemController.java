@@ -104,11 +104,12 @@ public class LootItemController {
 	@ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LootItem post(@RequestBody(required = false) LootItem lootItem) {
+    public LootItem createLootItem(@RequestBody(required = false) LootItem lootItem) {
         verifyCorrectPayload(lootItem);
 
         lootItem.setLootDate(Date.valueOf(LootDateCalculator.getCurrentLootDate()));
-
+        lootItem.setClanId(1);
+        
         return repository.save(lootItem);
     }
 
@@ -123,12 +124,12 @@ public class LootItemController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LootItem put(@PathVariable("id") Integer id, @RequestBody(required = false) LootItem lootItem) {
+    public LootItem updateLootItem(@PathVariable("id") Integer id, @RequestBody(required = false) LootItem lootItem) {
         verifyLootItemExists(id);
         verifyCorrectPayload(lootItem);
 
         lootItem.setLootDate(Date.valueOf(LootDateCalculator.getCurrentLootDate()));
-
+        lootItem.setClanId(1);
         lootItem.setId(id);
         return repository.save(lootItem);
     }

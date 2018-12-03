@@ -22,7 +22,7 @@ public class LootItem {
     private boolean disabled;
     private Integer playerId;
     private Date lootDate;
-    
+    private int clan_id;    
         
     public LootItem() {}
 
@@ -96,6 +96,16 @@ public class LootItem {
 
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
+	}
+
+	public int getClanId() {
+		return clan_id;
+	}
+
+	public void setClanId(int clan_id) {
+		this.clan_id = clan_id;
 	}	
+	
+	
 
 }

@@ -18,7 +18,7 @@ public class Player {
     private boolean enabled;
     private String password;
     private boolean admin;
-    private Integer clanId;
+    private Integer clan_id;
     
     public Player() {}
 
@@ -79,10 +79,10 @@ public class Player {
 	}
 
 	public Integer getClanId() {
-		return clanId;
+		return clan_id;
 	}
 
-	public void setClanId(Integer clanId) {
-		this.clanId = clanId;
+	public void setClanId(Integer clan_id) {
+		this.clan_id = clan_id;
 	}
 }

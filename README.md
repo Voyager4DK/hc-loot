@@ -19,9 +19,13 @@ oc rollout status dc/hc-loot
 	oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=my_data openshift/postgresql-92-centos7 --name=my-database
 
 # Connect to db
-	psql postgresql://${MY_DATABASE_SERVICE_HOST}:${MY_DATABASE_SERVICE_PORT}/my_data -U luke -c "SELECT * FROM player"
+	psql postgresql://${POSTGRESQL_FOR_HCLOOT_SERVICE_HOST}:${POSTGRESQL_FOR_HCLOOT_SERVICE_PORT}/hcloot_db -U hcloot -c "SELECT * FROM player"
 	
-	psql postgresql://${MY_DATABASE_SERVICE_HOST}:${MY_DATABASE_SERVICE_PORT}/my_data -U luke -c "SELECT distinct player_id from loot_item where loot_date='2018-11-27'"
+	psql postgresql://${POSTGRESQL_FOR_HCLOOT_SERVICE_HOST}:${POSTGRESQL_FOR_HCLOOT_SERVICE_PORT}/hcloot_db -U hcloot -c "SELECT distinct player_id from loot_item where loot_date='2018-11-27'"
+
+# Backup db
+cd /data
+pg_dump my_data | gzip > backup/my_data.gz
 
 #Url:
 	https://bit.ly/2BcYDYs
