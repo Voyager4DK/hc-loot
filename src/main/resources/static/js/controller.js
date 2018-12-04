@@ -74,6 +74,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
         	$rootScope.allPlayers = response.data;
         	scope.allPlayers = $rootScope.allPlayers;
         	_setEnabledPlayers(scope.allPlayers, scope);
+            scope.loading = false;
         }, function errorCallback(response) {
             console.log("failure: " + response.statusText);
         });
@@ -113,7 +114,9 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 }]);
 
 app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refreshPageData) {
-		
+
+    $scope.loading = true;
+
     // Now load the data from server
     refreshPageData.refreshPlayers($scope);
     
