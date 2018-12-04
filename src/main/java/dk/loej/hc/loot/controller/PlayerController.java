@@ -42,12 +42,12 @@ public class PlayerController {
         }
         
         //TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
         return StreamSupport
                 .stream(players.spliterator(), false)

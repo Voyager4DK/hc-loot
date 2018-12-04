@@ -108,9 +108,36 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 			if (!foundMatch) {
 				playerArray[playerArray.length] = player;
 			}
-		}		
-		
-    }    
+		}
+    }
+
+    this.refreshLootItems = function (scope, lootItem) {
+        scope.lootItems = $rootScope.lootItems;
+        scope.lootItemProperties = $rootScope.lootItemProperties;
+
+        $http({
+            method: 'GET',
+            url: 'api/loot_items'
+        }).then(function successCallback(response) {
+            $rootScope.lootItems = response.data;
+            scope.lootItems = $rootScope.lootItems;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+
+        $http({
+            method: 'GET',
+            url: 'api/loot_items/loot_item_properties'
+        }).then(function successCallback(response) {
+            $scope.lootItemProperties = response.data;
+            scope.lootItemProperties = $rootScope.lootItemProperties;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+
+
+    }
+
 }]);
 
 app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refreshPageData) {
@@ -270,10 +297,10 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
     }
 });
 
-app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope) {
+app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
     // Initialize page with default data which is blank in this example
-	$rootScope.lootItems = [];
+	//$rootScope.lootItems = [];
 
     $scope.form = {
         id: -1,
@@ -285,6 +312,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope) {
 
     // Now load the data from server
     _refreshPageData();
+    //refreshPageData.refreshLootItems($scope);
 
     // HTTP POST/PUT methods for add/edit lootItems
     $scope.update = function () {
