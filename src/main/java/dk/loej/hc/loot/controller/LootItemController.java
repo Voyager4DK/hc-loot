@@ -158,7 +158,8 @@ public class LootItemController {
     }
 
 	private void updateLootItemWithSameSequence(Integer change, LootItem lootItem) {
-		List<LootItem> lootItemsWithSameSequence = repository.findByLootDateAndPlayerIdAndOriginalAndPrioritySequence(lootItem.getLootDate(), lootItem.getPlayerId(), false, lootItem.getPrioritySequence());
+		boolean original = lootItem.getPlayerId() == null;
+		List<LootItem> lootItemsWithSameSequence = repository.findByLootDateAndPlayerIdAndOriginalAndPrioritySequence(lootItem.getLootDate(), lootItem.getPlayerId(), original, lootItem.getPrioritySequence());
 		if (!lootItemsWithSameSequence.isEmpty()) {
 			for (LootItem lootItemWithSameSeq : lootItemsWithSameSequence) {
 				lootItemWithSameSeq.setPrioritySequence(lootItemWithSameSeq.getPrioritySequence() - change);

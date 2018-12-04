@@ -61,12 +61,61 @@ app.config(function($routeProvider) {
 	}
 });
 
-app.controller('loginCtrl', function($scope, $http, $location, $rootScope) {
-	// Initialize page with default data which is blank in this example
-    $scope.players = [];
-	
+
+app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScope) {
+    this.refreshPlayers = function (scope, player) {
+    	_addPlayer(player);
+    	scope.players = $rootScope.players;
+    	scope.allPlayers = $rootScope.allPlayers;
+		$http({
+            method: 'GET',
+            url: 'api/players'
+        }).then(function successCallback(response) {
+        	$rootScope.allPlayers = response.data;
+        	scope.allPlayers = $rootScope.allPlayers;
+        	_setEnabledPlayers(scope.allPlayers, scope);
+        }, function errorCallback(response) {
+            console.log("failure: " + response.statusText);
+        });
+		
+		function _setEnabledPlayers(allPlayers, scope) {
+			var players = [];
+			for (var i=0; i<allPlayers.length; i++) {
+				if (allPlayers[i].enabled) {
+					players[players.length] = allPlayers[i];
+				}
+			}
+			scope.players = players;
+			$rootScope.players = players;
+		}
+		
+		function _addPlayer(player) {
+			if (player) {
+				_insertUpdatePlayer(player, $rootScope.allPlayers);
+				_insertUpdatePlayer(player, $rootScope.players);
+			}
+		}		
+		
+		function _insertUpdatePlayer(player, playerArray) {
+			var foundMatch = false;
+			for (var i=0; i<playerArray.length; i++) {
+				if (player.id == playerArray[i].id) {
+					foundMatch = true;
+					playerArray[i] = player;
+				}
+			}
+			if (!foundMatch) {
+				playerArray[playerArray.length] = player;
+			}
+		}		
+		
+    }    
+}]);
+
+app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refreshPageData) {
+		
     // Now load the data from server
-    _refreshPageData();    
+    refreshPageData.refreshPlayers($scope);
     
 	$scope.login = function() {
 		var loginData = {
@@ -75,18 +124,7 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope) {
 		};
 		
 		_loginPlayer(loginData);
-	};
-	
-	function _refreshPageData() {        
-		$http({
-            method: 'GET',
-            url: 'api/players/enabled'
-        }).then(function successCallback(response) {
-        	$scope.players = response.data;
-        }, function errorCallback(response) {
-            console.log("failure: " + response.statusText);
-        });
-    }
+	};	
 	
 	function _loginPlayer(loginData) {
 		$http({
@@ -108,7 +146,7 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope) {
     }
 });
 
-app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
+app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
     // Initialize page with default data which is blank in this example
     $scope.players = [];
@@ -124,8 +162,8 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     };
 
     // Now load the data from server
-    _refreshPageData();
-
+    refreshPageData.refreshPlayers($scope);
+    
     // HTTP POST/PUT methods for add/edit players
     $scope.update = function () {
         var method = "";
@@ -163,10 +201,13 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
         if (!confirm("Are you sure..?")) {
             return;
         }
+        
+        _markPlayerForDeletion(player);
+        
         $http({
             method: 'DELETE',
             url: 'api/players/' + player.id
-        }).then(_success, _error);
+        }).then(_successDelete, _error);
     };
     
     // In case of edit players, populate form with player data
@@ -178,26 +219,7 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
         $scope.form.enabled = player.enabled; 
         $scope.form.admin = player.admin;
         _getPassword(player.id);
-    };
-
-    /* Private Methods */
-    // HTTP GET- get all players collection
-    function _refreshPageData() {
-    	if ($rootScope.loggedInPlayer.admin) {
-    		$scope.admin = true;
-    	} else {
-    		$scope.admin = false;
-    	}
-        $scope.playerId = $rootScope.loggedInPlayer.id;
-        $http({
-            method: 'GET',
-            url: 'api/players'
-        }).then(function successCallback(response) {
-            $scope.players = response.data;
-        }, function errorCallback(response) {
-            console.log(response.statusText);
-        });
-    }
+    };    
 
     function _getPassword(playerId) {
         $http({
@@ -212,13 +234,26 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     }
 
     function _success(response) {
-        _refreshPageData();
-        _clearForm()
+    	refreshPageData.refreshPlayers($scope, response.data);
+        _clearForm();
+    }
+    
+    function _successDelete(response) {    	
+    	refreshPageData.refreshPlayers($scope);
     }
 
     function _error(response) {
         console.error(response.statusText);
     }
+    
+    function _markPlayerForDeletion(player) {
+    	for (var i=0; i<$rootScope.allPlayers.length; i++) {
+			if (player.id == $rootScope.allPlayers[i].id) {
+				console.log("found player to delete: " + $rootScope.allPlayers[i].name);
+				$rootScope.allPlayers[i].name = "[Marked for deletion]";
+			}
+		}
+	}
 
     // Clear the form
     function _clearForm() {
@@ -232,17 +267,17 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope) {
     }
 });
 
-app.controller("lootItemManagementCtrl", function ($scope, $http) {
+app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope) {
 
     // Initialize page with default data which is blank in this example
-    $scope.lootItems = [];
+	$rootScope.lootItems = [];
 
     $scope.form = {
         id: -1,
         rowAndNum: "",
         name: "",
         common: false,
-        prioritySequence: ($scope.lootItems.length+1)
+        prioritySequence: ($rootScope.lootItems.length+1)
     };
 
     // Now load the data from server
@@ -257,7 +292,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             // Id is absent so add lootItems - POST operation
             method = "POST";
             url = 'api/loot_items';
-            data.prioritySequence = $scope.lootItems.length+1;
+            data.prioritySequence = $rootScope.lootItems.length+1;
         } else {
             // If Id is present, it's edit operation - PUT operation
             method = "PUT";
@@ -320,7 +355,6 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
             _update(method, url, -1)
         }
-        // _refreshPageData();
     };
     
     $scope.moveDown = function() {
@@ -330,7 +364,6 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
             _update(method, url, 1)
         }
-        // _refreshPageData();
     };
 
     /* Private Methods */
@@ -340,7 +373,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http) {
             method: 'GET',
             url: 'api/loot_items'
         }).then(function successCallback(response) {
-            $scope.lootItems = response.data;
+        	$rootScope.lootItems = response.data;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });

@@ -36,17 +36,24 @@ public class PlayerController {
     @ResponseBody
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
-        Iterable<Player> players = repository.findAllByOrderByGloryPointsDesc();
+        Iterable<Player> players = repository.findAllByOrderByNameAsc();
         for (Player player : players) {
             player.setPassword(null);
         }
+        
+        try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         return StreamSupport
                 .stream(players.spliterator(), false)
                 .collect(Collectors.toList());
     }
     
-    @ResponseBody
+/*    @ResponseBody
     @GetMapping(value = "/enabled", produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAllEnabled() {
         Iterable<Player> players = repository.findByEnabledOrderByNameAsc(true);
@@ -57,7 +64,7 @@ public class PlayerController {
         return StreamSupport
                 .stream(players.spliterator(), false)
                 .collect(Collectors.toList());
-    }
+    }*/
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)

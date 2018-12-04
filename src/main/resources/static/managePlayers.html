@@ -36,12 +36,12 @@
             <th class="table-cell">&nbsp;</th>
             <th class="table-cell">&nbsp;</th>
         </tr>
-        <tr class="table-row-cell" ng-repeat="player in players">
+        <tr class="table-row-cell" ng-repeat="player in allPlayers">
             <td class="table-cell">{{ player.name }}</td>
             <td class="table-cell">{{ player.gloryPoints }}</td>
             <td class="table-cell">
-                <a ng-show="admin || player.id == playerId" ng-click="edit( player )" class="btn">Edit</a>
-                <a ng-show="admin" ng-click="remove( player )" class="btn">Remove</a>
+                <a ng-show="loggedInPlayer.admin || player.id == loggedInPlayer.id" ng-click="edit( player )" class="btn">Edit</a>
+                <a ng-show="loggedInPlayer.admin" ng-click="remove( player )" class="btn">Remove</a>
             </td>
         </tr>
     </table>
