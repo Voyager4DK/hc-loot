@@ -1,15 +1,20 @@
-<div class="container">
-    <h1 align="center">Welcome {{loggedInPlayer.name}} to Hustle Castle clan "Danmark" loot page</h1>
+<div class="container" ng-controller="mainCtrl">
+
+	<div ng-show="loading" align="center"><img src="image/loading-indicator.gif"></div>
+
+	<div ng-hide="loading">
+	    <h1 align="center">Welcome {{loggedInPlayer.name}} to Hustle Castle clan "Danmark" loot page</h1>
+	
+		<p align="center">This is still under construction, so can/will change from day to day.</p>
+		
+		<div class="row" align="center"><a href="#!managePlayers">Manage players</a></div>
+		
+		<div class="row" align="center"><a href="#!manageLootItems">Manage loot items</a></div>
+		
+		<div class="row" align="center"><a href="#!wishList">Wish List</a></div>
+		
+		<div class="row" align="center"><a href="#!results">Loot item distribution result</a></div>
+		
+		<div class="row" align="center"><a href="#!comments">Comments & Feedback</a></div>
+	</div>
 </div>
-
-<p align="center">This is still under construction, so can/will change from day to day.</p>
-
-<div class="row" align="center"><a href="#!managePlayers">Manage players</a></div>
-
-<div class="row" align="center"><a href="#!manageLootItems">Manage loot items</a></div>
-
-<div class="row" align="center"><a href="#!wishList">Wish List</a></div>
-
-<div class="row" align="center"><a href="#!results">Loot item distribution result</a></div>
-
-<div class="row" align="center"><a href="#!comments">Comments & Feedback</a></div>

@@ -45,6 +45,14 @@ public class LootItemController {
     @ResponseBody
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
+    	//TODO remove this again : Used for simulating slow load times!
+        try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
         return StreamSupport
                 .stream(repository.findByLootDateAndOriginalOrderByPrioritySequenceAsc(lastLootDate, true).spliterator(), false)

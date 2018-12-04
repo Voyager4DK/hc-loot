@@ -5,10 +5,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.xml.bind.ValidationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,12 +45,12 @@ public class PlayerController {
         }
         
         //TODO remove this again : Used for simulating slow load times!
-        /*try {
-			Thread.sleep(10000);
+        try {
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 
         return StreamSupport
                 .stream(players.spliterator(), false)
@@ -57,9 +60,15 @@ public class PlayerController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Player post(@RequestBody(required = false) Player player) {
+    public Player createPlayer(@RequestBody(required = false) Player player) throws ValidationException {
         verifyCorrectPayload(player);
-
+        //TODO remove this again : Used for simulating slow load times!
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return repository.save(player);
     }
 
@@ -74,10 +83,16 @@ public class PlayerController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Player put(@PathVariable("id") Integer id, @RequestBody(required = false) Player player) {
+    public Player updatePlayer(@PathVariable("id") Integer id, @RequestBody(required = false) Player player) throws ValidationException {
         verifyPlayerExists(id);
         verifyCorrectPayload(player);
-
+        //TODO remove this again : Used for simulating slow load times!
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         player.setId(id);
         return repository.save(player);
     }
@@ -96,13 +111,17 @@ public class PlayerController {
         }
     }
 
-    private void verifyCorrectPayload(Player player) {
+    private void verifyCorrectPayload(Player player) throws ValidationException {
         if (Objects.isNull(player)) {
-            throw new RuntimeException("Player cannot be null");
+            throw new ValidationException("Player cannot be null");
+        }
+        
+        if (StringUtils.isEmpty(player.getName())) {
+            throw new ValidationException("Player name cannot be empty");
         }
 
-        if (!Objects.isNull(player.getId())) {
+        /*if (!Objects.isNull(player.getId())) {
             throw new RuntimeException("Id field must be generated");
-        }
+        }*/
     }
 }

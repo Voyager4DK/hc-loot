@@ -24,7 +24,7 @@
         <div class="row" ng-show="admin">
             <div class="col-6"><label><input type="checkbox" ng-model="form.admin"> Player is Admin</label></div>
         </div>
-        <input type="submit" value="Save"/>
+        <input ng-disabled="saveDisabled" type="submit" value="Save"/>
     </form>
 
     <h3>Player list</h3>

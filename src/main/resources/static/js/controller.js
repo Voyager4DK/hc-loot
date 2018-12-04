@@ -63,8 +63,17 @@ app.config(function($routeProvider) {
 
 
 app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScope) {
+	this.quickDeleteEnitity = function (id, array) {		
+    	for (var i=0; i<array.length; i++) {
+			if (id == array[i].id) {
+				console.log("found entity to delete: " + array[i].name);
+				array.splice(i, 1);
+			}
+		}		
+	}
+	
     this.refreshPlayers = function (scope, player) {
-    	_addPlayer(player);
+    	//_addPlayer(player);
     	scope.players = $rootScope.players;
     	scope.allPlayers = $rootScope.allPlayers;
 		$http({
@@ -90,7 +99,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 			$rootScope.players = players;
 		}
 		
-		function _addPlayer(player) {
+		/*function _addPlayer(player) {
 			if (player) {
 				_insertUpdatePlayer(player, $rootScope.allPlayers);
 				_insertUpdatePlayer(player, $rootScope.players);
@@ -108,7 +117,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 			if (!foundMatch) {
 				playerArray[playerArray.length] = player;
 			}
-		}
+		}*/
     }
 
     this.refreshLootItems = function (scope, lootItem) {
@@ -121,6 +130,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
         }).then(function successCallback(response) {
             $rootScope.lootItems = response.data;
             scope.lootItems = $rootScope.lootItems;
+            scope.loading = false;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
@@ -129,7 +139,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
             method: 'GET',
             url: 'api/loot_items/loot_item_properties'
         }).then(function successCallback(response) {
-            $scope.lootItemProperties = response.data;
+        	$rootScope.lootItemProperties = response.data;
             scope.lootItemProperties = $rootScope.lootItemProperties;
         }, function errorCallback(response) {
             console.log(response.statusText);
@@ -141,7 +151,6 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 }]);
 
 app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refreshPageData) {
-
     $scope.loading = true;
 
     // Now load the data from server
@@ -176,6 +185,14 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refre
     }
 });
 
+app.controller("mainCtrl", function ($scope, $http, $rootScope, refreshPageData) {
+    if (!$rootScope.lootItems) {
+    	$scope.loading = true;
+    }
+	
+	refreshPageData.refreshLootItems($scope);
+});
+
 app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
     // Initialize page with default data which is blank in this example
@@ -196,6 +213,7 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
     
     // HTTP POST/PUT methods for add/edit players
     $scope.update = function () {
+    	$scope.saveDisabled = true;
         var method = "";
         var url = "";
         var data = {};
@@ -209,12 +227,15 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
             url = 'api/players/' + $scope.form.id;
         }
         
+        data.id = $scope.form.id;
         data.name = $scope.form.name;
         data.password = $scope.form.password;
         data.gloryPoints = $scope.form.gloryPoints;
         data.lootEnabled = $scope.form.lootEnabled;
         data.enabled = $scope.form.enabled;
         data.admin = $scope.form.admin;
+        
+        //_quickAddOrUpdatePlayer(data);
 
         $http({
             method: method,
@@ -232,7 +253,7 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
             return;
         }
 
-        _deletePlayerQuick(player);
+        refreshPageData.quickDeleteEnitity(player.id, $rootScope.allPlayers);
         
         $http({
             method: 'DELETE',
@@ -249,7 +270,27 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
         $scope.form.enabled = player.enabled; 
         $scope.form.admin = player.admin;
         _getPassword(player.id);
-    };    
+    };
+    
+    function _quickAddOrUpdatePlayer(player) {
+		if (player) {
+			_insertUpdatePlayer(player, $rootScope.allPlayers);
+			_insertUpdatePlayer(player, $rootScope.players);
+		}
+	}		
+	
+	function _insertUpdatePlayer(player, playerArray) {
+		var foundMatch = false;
+		for (var i=0; i<playerArray.length; i++) {
+			if (player.id == playerArray[i].id) {
+				foundMatch = true;
+				playerArray[i] = player;
+			}
+		}
+		if (!foundMatch) {
+			playerArray[playerArray.length] = player;
+		}
+	}
 
     function _getPassword(playerId) {
         $http({
@@ -264,26 +305,19 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
     }
 
     function _success(response) {
-    	refreshPageData.refreshPlayers($scope, response.data);
-        _clearForm();
+    	_quickAddOrUpdatePlayer(response.data);
+    	$scope.saveDisabled = false;
+    	_clearForm();
+    	refreshPageData.refreshPlayers($scope);
     }
     
-    function _successDelete(response) {    	
-    	refreshPageData.refreshPlayers($scope);
+    function _successDelete(response) {
+    	refreshPageData.refreshPlayers($scope);    	
     }
 
     function _error(response) {
-        console.error(response.statusText);
+        alert("Your request failed! " + response.statusText);
     }
-    
-    function _deletePlayerQuick(player) {
-    	for (var i=0; i<$rootScope.allPlayers.length; i++) {
-			if (player.id == $rootScope.allPlayers[i].id) {
-				console.log("found player to delete: " + $rootScope.allPlayers[i].name);
-				$rootScope.allPlayers.splice(i, 1);
-			}
-		}
-	}
 
     // Clear the form
     function _clearForm() {
@@ -307,12 +341,11 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
         rowAndNum: "",
         name: "",
         common: false,
-        prioritySequence: ($rootScope.lootItems.length+1)
+        prioritySequence: 1
     };
 
     // Now load the data from server
-    _refreshPageData();
-    //refreshPageData.refreshLootItems($scope);
+    refreshPageData.refreshLootItems($scope);
 
     // HTTP POST/PUT methods for add/edit lootItems
     $scope.update = function () {
@@ -343,15 +376,13 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     $scope.remove = function () {
     	if (!confirm("Are you sure you want to delete that?")) {
             return;
-        }
-    	if ($scope.selectedLootItemId.constructor === Array) {
-            var ids = $scope.selectedLootItemId;
-            for (i = 0; i < ids.length; i++) {
-                _delete(ids[i]);
-            }
-        } else {
-            _delete($scope.selectedLootItemId);
-        }
+        }    	
+    	
+        var ids = $scope.selectedLootItemId;
+        for (i = 0; i < ids.length; i++) {
+        	refreshPageData.quickDeleteEnitity(ids[i], $rootScope.lootItems);
+            _delete(ids[i]);
+        }        
     };
 
     // In case of edit lootItems, populate form with lootItem data
@@ -398,27 +429,6 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     };
 
     /* Private Methods */
-    // HTTP GET- get all lootItems collection
-    function _refreshPageData() {
-        $http({
-            method: 'GET',
-            url: 'api/loot_items'
-        }).then(function successCallback(response) {
-        	$rootScope.lootItems = response.data;
-        }, function errorCallback(response) {
-            console.log(response.statusText);
-        });
-
-        $http({
-            method: 'GET',
-            url: 'api/loot_items/loot_item_properties'
-        }).then(function successCallback(response) {
-            $scope.lootItemProperties = response.data;
-        }, function errorCallback(response) {
-            console.log(response.statusText);
-        });
-    }
-
     function _delete(id) {
         $http({
             method: 'DELETE',
@@ -438,8 +448,9 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     }
 
     function _success(response) {
-        _refreshPageData();
-        _clearForm()
+    	refreshPageData.refreshLootItems($scope);
+        //_refreshPageData();
+        _clearForm();
     }
 
     function _error(response) {
