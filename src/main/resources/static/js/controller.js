@@ -201,8 +201,8 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
         if (!confirm("Are you sure..?")) {
             return;
         }
-        
-        _markPlayerForDeletion(player);
+
+        _deletePlayerQuick(player);
         
         $http({
             method: 'DELETE',
@@ -246,11 +246,11 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
         console.error(response.statusText);
     }
     
-    function _markPlayerForDeletion(player) {
+    function _deletePlayerQuick(player) {
     	for (var i=0; i<$rootScope.allPlayers.length; i++) {
 			if (player.id == $rootScope.allPlayers[i].id) {
 				console.log("found player to delete: " + $rootScope.allPlayers[i].name);
-				$rootScope.allPlayers[i].name = "[Marked for deletion]";
+				$rootScope.allPlayers.splice(i, 1);
 			}
 		}
 	}
