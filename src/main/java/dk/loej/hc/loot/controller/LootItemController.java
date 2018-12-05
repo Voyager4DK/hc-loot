@@ -47,7 +47,7 @@ public class LootItemController {
     public List getAll() {
     	//TODO remove this again : Used for simulating slow load times!
         try {
-			Thread.sleep(10000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,6 +62,14 @@ public class LootItemController {
     @ResponseBody
     @GetMapping(value = "/for_player/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAllForPlayer(@PathVariable("playerId") Integer playerId) {
+    	//TODO remove this again : Used for simulating slow load times!
+        try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}    	
+    	
     	Player player = playerRepository.findOne(playerId);
     	    	
     	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());

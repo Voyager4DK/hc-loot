@@ -17,7 +17,7 @@
     		</td>
     		<td class="row">
     			<select size="6" ng-model="selectedEnabledLootItemId" multiple>
-            		<option ng-repeat="lootItem in lootItems" value="{{ lootItem.id }}">({{ lootItem.prioritySequence }}) {{ lootItem.rowAndNum }} {{ lootItem.name }} &nbsp;&nbsp;&nbsp;</option>
+            		<option ng-repeat="lootItem in wishItems" value="{{ lootItem.id }}">({{ lootItem.prioritySequence }}) {{ lootItem.rowAndNum }} {{ lootItem.name }} &nbsp;&nbsp;&nbsp;</option>
         		</select>
     		</td>
     		<td>
@@ -26,7 +26,7 @@
     		</td>
     		<td class="row">
     			<select size="6" ng-model="selectedDisabledLootItemId" multiple>
-            		<option ng-repeat="disabledLootItem in disabledLootItems" value="{{ disabledLootItem.id }}">({{ disabledLootItem.prioritySequence }}) {{ disabledLootItem.rowAndNum }} {{ disabledLootItem.name }} &nbsp;&nbsp;&nbsp;</option>
+            		<option ng-repeat="disabledLootItem in disabledLootItems" value="{{ disabledLootItem.id }}">{{ disabledLootItem.rowAndNum }} {{ disabledLootItem.name }} &nbsp;&nbsp;&nbsp;</option>
         		</select>
     		</td>
     	</tr>
@@ -41,7 +41,7 @@
     <table align="center" ng-hide="lootDisabled">
     	<tr>
     		<td>
-    			<div align="left" ng-repeat="lootItem in lootItems">{{ lootItem.prioritySequence }}. {{ lootItem.rowAndNum }} {{ lootItem.name }} </div>
+    			<div align="left" ng-repeat="lootItem in wishItems">{{ lootItem.prioritySequence }}. {{ lootItem.rowAndNum }} {{ lootItem.name }} </div>
     		</td>
     	</tr>
     </table>

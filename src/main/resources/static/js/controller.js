@@ -72,6 +72,28 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 		}		
 	}
 	
+	this.quickMoveLootItem = function (id, diff, lootItems) {
+		var itemMoved = false;
+    	for (j = 0; j < lootItems.length; j++) {
+    		var lootItem = lootItems[j];
+    		if (lootItem.id == id) {
+    			if (lootItem.prioritySequence+diff > 0 && lootItem.prioritySequence+diff <= lootItems.length) {
+    				var otherItem = lootItems[j+diff];
+    				lootItem.prioritySequence = lootItem.prioritySequence + diff;
+    				if (otherItem.prioritySequence == lootItem.prioritySequence) {
+    					console.log("otherItem.prioritySequence=" +otherItem.prioritySequence + ", lootItem.prioritySequence=" +lootItem.prioritySequence)
+    					otherItem.prioritySequence = otherItem.prioritySequence - diff;
+        				lootItems[j+diff] = lootItem;
+        				lootItems[j] = otherItem;
+    				}    				
+    				itemMoved = true;
+    			}
+    			break;   			
+    		}
+    	}
+    	return itemMoved;
+    }
+	
     this.refreshPlayers = function (scope, player) {
     	//_addPlayer(player);
     	scope.players = $rootScope.players;
@@ -410,12 +432,12 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     
     $scope.moveUp = function() {
     	var ids = $scope.selectedLootItemId;
-        console.log("ids=" + ids);
-    	for (i = 0; i < ids.length; i++) {
-    		console.log("ids[" + i + "]=" + ids[i]);
-        	var method = "PUT";
+        for (i = 0; i < ids.length; i++) {
+    		var method = "PUT";
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            _update(method, url, -1)
+            if (refreshPageData.quickMoveLootItem(ids[i], -1, $scope.lootItems)) {
+            	_update(method, url, -1);
+            }            
         }
     };
     
@@ -424,7 +446,10 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
         for (i = 0; i < ids.length; i++) {        	
         	var method = "PUT";
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            _update(method, url, 1)
+            if (refreshPageData.quickMoveLootItem(ids[i], 1, $scope.lootItems)) {
+            	_update(method, url, 1);
+            }
+            
         }
     };
 
@@ -437,7 +462,8 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     }
     
     function _update(method, url, data) {
-    	$http({
+    	console.log("url=" + url);
+    	$http({    		
             method: method,
             url: url,
             data: angular.toJson(data),
@@ -467,10 +493,10 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     }
 });
 
-app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
+app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
     // Initialize page with default data which is blank in this example
-    $scope.lootItems = [];
+    $scope.wishItems = [];
 
     // Now load the data from server
     if ($rootScope.loggedInPlayer.lootEnabled) {
@@ -487,7 +513,9 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         	if (ids[i].length > 0) {
         		var method = "PUT";
         		var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-        		_update(method, url, -1);
+        		if (refreshPageData.quickMoveLootItem(ids[i], -1, $scope.wishItems)) {
+        			_update(method, url, -1);
+        		}
         	}
         }
     };
@@ -497,7 +525,9 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         for (i = 0; i < ids.length; i++) {        	
         	var method = "PUT";
             var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            _update(method, url, 1)
+            if (refreshPageData.quickMoveLootItem(ids[i], 1, $scope.wishItems)) {
+            	_update(method, url, 1)
+            }
         }
     };
     
@@ -509,6 +539,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         for (i = 0; i < ids.length; i++) {        	
         	var method = "PUT";
             var url = 'api/loot_items/' + ids[i] + "/toggle";
+            _quickToggle(ids[i], disabled);
             _update(method, url, disabled)
         }
     };
@@ -547,22 +578,42 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
+        $scope.refresh = false;
+    }
+    
+    function _quickToggle(id, disabled) {
+    	if (disabled) {
+    		_moveEntityFromArray1ToArray2(id, $scope.wishItems, $scope.disabledLootItems);    	
+    	} else {
+    		$scope.refresh = true;
+    		_moveEntityFromArray1ToArray2(id, $scope.disabledLootItems, $scope.wishItems);
+    	} 
+    }
+    
+    function _moveEntityFromArray1ToArray2(id, array1, array2) {
+    	for (var j=0; j<array1.length; j++) {
+			if (array1[j].id == id) {
+				array2[array2.length] = array1[j];
+				array1.splice(j, 1);
+				break;
+			}
+		}
     }
     
     function _splitLootItemData(lootItems) {
-    	$scope.lootItems = [];
+    	$scope.wishItems = [];
     	$scope.disabledLootItems = [];
     	var disabledLootItems
     	for (var i = 0; i < lootItems.length; i++) {
 			if (lootItems[i].disabled) {
 				$scope.disabledLootItems[$scope.disabledLootItems.length] = lootItems[i];
 			} else {
-				$scope.lootItems[$scope.lootItems.length] = lootItems[i];
+				$scope.wishItems[$scope.wishItems.length] = lootItems[i];
 			}
 		}
     }
     
-    function _update(method, url, data) {
+    function _update(method, url, data, refresh) {
     	$http({
             method: method,
             url: url,
@@ -574,11 +625,14 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope) {
     }
 
     function _success(response) {
-        _refreshPageData();
+        console.log("Update was a success");
+        if ($scope.refresh) {
+        	_refreshPageData();
+        }
     }
 
     function _error(response) {
-        console.error(response.statusText);
+        console.error("Update failed: " + response.statusText);
     }
 });
 

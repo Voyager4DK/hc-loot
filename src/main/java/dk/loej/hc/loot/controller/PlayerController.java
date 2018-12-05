@@ -45,12 +45,12 @@ public class PlayerController {
         }
         
         //TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
         return StreamSupport
                 .stream(players.spliterator(), false)
@@ -63,12 +63,12 @@ public class PlayerController {
     public Player createPlayer(@RequestBody(required = false) Player player) throws ValidationException {
         verifyCorrectPayload(player);
         //TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         return repository.save(player);
     }
 
@@ -87,12 +87,12 @@ public class PlayerController {
         verifyPlayerExists(id);
         verifyCorrectPayload(player);
         //TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         player.setId(id);
         return repository.save(player);
     }
