@@ -53,9 +53,9 @@ public class LootItemController {
 			e.printStackTrace();
 		}*/
     	
-    	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
+    	Date currentLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
         return StreamSupport
-                .stream(repository.findByLootDateAndOriginalOrderByPrioritySequenceAsc(lastLootDate, true).spliterator(), false)
+                .stream(repository.findByLootDateAndOriginalOrderByPrioritySequenceAsc(currentLootDate, true).spliterator(), false)
                 .collect(Collectors.toList());
     }
     

@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import dk.loej.hc.loot.entity.DistributionResult;
+import dk.loej.hc.loot.entity.GloryRanking;
 import dk.loej.hc.loot.entity.LootItem;
 import dk.loej.hc.loot.entity.Player;
 import dk.loej.hc.loot.repository.DistributionResultRepository;
+import dk.loej.hc.loot.repository.GloryRankingRepository;
 import dk.loej.hc.loot.repository.LootItemRepository;
 import dk.loej.hc.loot.repository.PlayerRepository;
 import dk.loej.hc.loot.util.LootDateCalculator;
@@ -30,13 +32,16 @@ public class DistributionResultController {
 	
 	private final DistributionResultRepository distributionResultRepository;
 	private final LootItemRepository lootItemRepository;
-    private final PlayerRepository playerRepository;
+    //private final PlayerRepository playerRepository;
+    private final GloryRankingRepository gloryRankingRepository;
     
     @Autowired
-    public DistributionResultController(DistributionResultRepository distributionResultRepository, LootItemRepository lootItemRepository, PlayerRepository playerRepository) {
+    public DistributionResultController(DistributionResultRepository distributionResultRepository, LootItemRepository lootItemRepository, PlayerRepository playerRepository, 
+    		GloryRankingRepository gloryRankingRepository) {
 		this.distributionResultRepository = distributionResultRepository;
 		this.lootItemRepository = lootItemRepository;
-		this.playerRepository = playerRepository;
+		//this.playerRepository = playerRepository;
+		this.gloryRankingRepository = gloryRankingRepository;
 	}
 	
 	@ResponseBody
@@ -52,25 +57,26 @@ public class DistributionResultController {
     @ResponseBody
     @GetMapping(value = "/distribute", produces = MediaType.APPLICATION_JSON_VALUE)
     public List distributeLoot() {
-    	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
+    	Date currentLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
     	List<DistributionResult> distributionResults = new ArrayList<>();
     	//TODO add find by lastLootDate
-        deleteExistingDistributionsResults(lastLootDate);
-        Map<String, LootItem> lootItemMap = getLootItemsMap(lastLootDate); 
+        deleteExistingDistributionsResults(currentLootDate);
+        Map<String, LootItem> lootItemMap = getLootItemsMap(currentLootDate); 
         
-        List<Player> players = playerRepository.findByEnabledAndLootEnabledOrderByGloryPointsDesc(true, true);
+        List<GloryRanking> gloryRankings = gloryRankingRepository.findByLootDateAndEligibleForLootOrderByGloryDesc(currentLootDate, true);//playerRepository.findByEnabledAndLootEnabledOrderByGloryPointsDesc(true, true);
+        gloryRankings = removePlayerThatDontWantLoot(gloryRankings);
         int i = 0;
         while (!lootItemMap.isEmpty()) {
-        	List<LootItem> wishList = getWishList(players.get(i).getId(), lastLootDate);
+        	List<LootItem> wishList = getWishList(gloryRankings.get(i).getPlayer().getId(), currentLootDate);
         	for (LootItem wish : wishList) {
 				if (lootItemMap.containsKey(wish.getRowAndNum())) {
-					distributionResults.add(createDistributionResult(lootItemMap.get(wish.getRowAndNum()), players.get(i), lastLootDate, distributionResults.size()+1));
+					distributionResults.add(createDistributionResult(lootItemMap.get(wish.getRowAndNum()), gloryRankings.get(i), currentLootDate, distributionResults.size()+1));
 					lootItemMap.remove(wish.getRowAndNum());
 					break;
 				}
 			}
         	i++;
-        	if (i == players.size()) {
+        	if (i == gloryRankings.size()) {
         		i = 0;
         	}        	
         }
@@ -78,13 +84,22 @@ public class DistributionResultController {
     	
     	return distributionResults;
     }
+    
+    private List<GloryRanking> removePlayerThatDontWantLoot(List<GloryRanking> gloryRankings) {
+    	for (GloryRanking gloryRanking : gloryRankings) {
+			if (!gloryRanking.getPlayer().isLootEnabled()) {
+				gloryRankings.remove(gloryRanking);
+			}
+		}
+    	return gloryRankings;
+    }
 
-	private DistributionResult createDistributionResult(LootItem lootItem, Player player, Date lastLootDate, int resultIndex) {
+	private DistributionResult createDistributionResult(LootItem lootItem, GloryRanking gloryRanking, Date lastLootDate, int resultIndex) {
 		DistributionResult distributionResult = new DistributionResult();
-		distributionResult.setGloryPoints(player.getGloryPoints());
+		distributionResult.setGloryPoints(gloryRanking.getGlory());
 		distributionResult.setLootDate(lastLootDate);
 		distributionResult.setLootItem(lootItem);
-		distributionResult.setPlayer(player);
+		distributionResult.setPlayer(gloryRanking.getPlayer());
 		distributionResult.setOrderSequence(resultIndex);
 		
 		return distributionResult;

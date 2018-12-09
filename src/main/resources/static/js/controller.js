@@ -37,6 +37,14 @@ app.config(function($routeProvider) {
 		},
 		templateUrl: 'wishList.html'
 	})
+	.when('/gloryRankings', {
+		resolve: {
+			"check": function($location, $rootScope) {
+				_goToLoginIfNotLoggedId($location, $rootScope);
+			}
+		},
+		templateUrl: 'gloryRankings.html'
+	})
 	.when('/results', {
 		resolve: {
 			"check": function($location, $rootScope) {
@@ -94,6 +102,33 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
     	return itemMoved;
     }
 	
+	this.refreshAdmin = function(scope) {
+		if ($rootScope.loggedInPlayer.admin) {
+			scope.admin = true;
+		} else {
+			scope.admin = false;
+		}
+	}
+	
+	this.refreshGloryRankings = function(scope) {
+		scope.gloryRankings = $rootScope.gloryRankings;
+		
+		if (!scope.gloryRankings) {
+			scope.gloryRankings = [];
+		}
+		
+		$http({
+            method: 'GET',
+            url: 'api/glory_rankings'
+        }).then(function successCallback(response) {
+        	console.log("Succesfully loaded glory points");
+        	$rootScope.gloryRankings = response.data;
+        	scope.gloryRankings = $rootScope.gloryRankings;
+        }, function errorCallback(response) {
+            console.error("Failed to load glory points: " + response.statusText);
+        });
+	}
+	
     this.refreshPlayers = function (scope, player) {
     	//_addPlayer(player);
     	scope.players = $rootScope.players;
@@ -107,7 +142,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
         	_setEnabledPlayers(scope.allPlayers, scope);
             scope.loading = false;
         }, function errorCallback(response) {
-            console.log("failure: " + response.statusText);
+            console.error("failure: " + response.statusText);
         });
 		
 		function _setEnabledPlayers(allPlayers, scope) {
@@ -120,26 +155,6 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 			scope.players = players;
 			$rootScope.players = players;
 		}
-		
-		/*function _addPlayer(player) {
-			if (player) {
-				_insertUpdatePlayer(player, $rootScope.allPlayers);
-				_insertUpdatePlayer(player, $rootScope.players);
-			}
-		}		
-		
-		function _insertUpdatePlayer(player, playerArray) {
-			var foundMatch = false;
-			for (var i=0; i<playerArray.length; i++) {
-				if (player.id == playerArray[i].id) {
-					foundMatch = true;
-					playerArray[i] = player;
-				}
-			}
-			if (!foundMatch) {
-				playerArray[playerArray.length] = player;
-			}
-		}*/
     }
     
     this.refreshFeatureToggles = function (scope) {   	
@@ -151,7 +166,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
             $rootScope.wishListDisabled = response.data;
             scope.wishListDisabled = $rootScope.wishListDisabled;
         }, function errorCallback(response) {
-            console.log(response.statusText);
+            console.error(response.statusText);
         });
     }
 
@@ -167,7 +182,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
             scope.lootItems = $rootScope.lootItems;
             scope.loading = false;
         }, function errorCallback(response) {
-            console.log(response.statusText);
+            console.error(response.statusText);
         });
 
         $http({
@@ -177,9 +192,8 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
         	$rootScope.lootItemProperties = response.data;
             scope.lootItemProperties = $rootScope.lootItemProperties;
         }, function errorCallback(response) {
-            console.log(response.statusText);
+            console.error(response.statusText);
         });
-
 
     }
 
@@ -214,7 +228,7 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refre
         	$location.path("/main");
         }, function errorCallback(error, statusText) {
         	$rootScope.loggedInPlayer = null;
-        	console.log("Login failed with error code: " + error.status); 
+        	console.error("Login failed with error code: " + error.status); 
         	alert("You failed to login!");
         });
     }
@@ -336,7 +350,7 @@ app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refr
             var player = response.data;
             $scope.form.password = player.password;
         }, function errorCallback(response) {
-            console.log(response.statusText);
+            console.error(response.statusText);
         });
     }
 
@@ -439,7 +453,7 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
             $scope.form.common = lootItem.common;
             $scope.form.prioritySequence = lootItem.prioritySequence;            
         }, function errorCallback(response) {
-            console.log(response.statusText);
+            console.error(response.statusText);
         });
 
     };
@@ -507,18 +521,36 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
     }
 });
 
+app.controller("gloryRankingsCtrl", function ($scope, $http, $rootScope, refreshPageData) {
+	refreshPageData.refreshGloryRankings($scope);
+	refreshPageData.refreshAdmin($scope);
+	
+	$scope.saveGloryRankings = function() {
+		$http({    		
+            method: "PUT",
+            url: "api/glory_rankings",
+            data: angular.toJson($scope.gloryRankings),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function successCallback(response) {
+        	console.log("Success in updated glory rankings!");
+        	$rootScope.gloryRankings = $scope.gloryRankings;
+        }, function errorCallback(response) {
+        	console.error("Failed updated glory rankings!");
+        });
+	}
+});
+
+
 app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
     // Initialize page with default data which is blank in this example
     $scope.wishItems = [];
     
     refreshPageData.refreshFeatureToggles($scope);
+    refreshPageData.refreshAdmin($scope);
     
-    if ($rootScope.loggedInPlayer.admin) {
-		$scope.admin = true;
-	} else {
-		$scope.admin = false;
-	}
     
     // Now load the data from server
     if ($rootScope.loggedInPlayer.lootEnabled) {
@@ -690,7 +722,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     }
 });
 
-app.controller("resultsCtrl", function ($scope, $http, $rootScope) {
+app.controller("resultsCtrl", function ($scope, $http, $rootScope, refreshPageData) {
 
 	_refreshPageData();
 	
@@ -710,11 +742,7 @@ app.controller("resultsCtrl", function ($scope, $http, $rootScope) {
 	
 	
 	function _refreshPageData() {
-		if ($rootScope.loggedInPlayer.admin) {
-    		$scope.admin = true;
-    	} else {
-    		$scope.admin = false;
-    	}
+		refreshPageData.refreshAdmin($scope);
 		$http({
             method: 'GET',
             url: 'api/result'

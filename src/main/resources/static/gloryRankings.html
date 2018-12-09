@@ -1,0 +1,56 @@
+<div class="container" ng-controller="gloryRankingsCtrl">
+	<h1 align="center">Glory Rankings</h1>
+	
+	<p align="center" ng-show="admin">
+		<select  id="lootDateSelect" ng-model="lootDateSelected" ng-change="lootDateChanged()" style="width: 100%">
+            <option ng-repeat="lootDate in lootDates" value="{{ player.id }}">{{ player.name }}</option>
+        </select>
+	</p>
+
+	<div ng-show="admin">
+		
+		<form ng-submit="saveGloryRankings()">
+			<table align="center">
+				<tr>
+					<th align="left">Glory</th>
+					<th>&nbsp;&nbsp;</th>
+					<th align="left">Player</th>
+					<th align="center">Wants<br>loot</th>
+					<th>&nbsp;&nbsp;</th>
+					<th align="center">Eligible<br>for loot</th>
+				</tr>
+		    	<tr ng-repeat="gloryRanking in gloryRankings">
+		    		<td align="left"><input type="text" placeholder="Glory" ng-model="gloryRanking.glory" size="60"/></td>
+		    		<td>&nbsp;&nbsp;</td>
+		    		<td align="left">{{gloryRanking.player.name}}</td>
+		    		<td align="center"><input type="checkbox" ng-model="gloryRanking.player.lootEnabled" ng-disabled="true"></td>
+		    		<td>&nbsp;&nbsp;</td>
+		    		<td align="center"><input type="checkbox" ng-model="gloryRanking.eligibleForLoot"></td>
+		    	</tr>
+			</table>
+			<input ng-disabled="saveDisabled" type="submit" value="Save"/>
+		</form>	
+	</div>
+	
+	<div ng-hide="admin">
+		<table align="center">
+			<tr>
+				<th align="left">Glory</th>
+				<th>&nbsp;&nbsp;</th>
+				<th align="left">Player</th>
+				<th align="center">Wants<br>loot</th>
+				<th>&nbsp;&nbsp;</th>
+				<th align="center">Eligible<br>for loot</th>
+			</tr>
+	    	<tr ng-repeat="gloryRanking in gloryRankings">
+	    		<td align="left">{{gloryRanking.glory}}</td>
+	    		<td>&nbsp;&nbsp;</td>
+	    		<td align="left">{{gloryRanking.player.name}}</td>
+	    		<td align="center"><input type="checkbox" ng-model="gloryRanking.player.lootEnabled" ng-disabled="true"></td>
+	    		<td>&nbsp;&nbsp;</td>
+	    		<td align="center"><input type="checkbox" ng-model="gloryRanking.eligibleForLoot" ng-disabled="true"></td>
+	    	</tr>
+	    </table>
+	</div>
+
+</div>

@@ -11,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class GloryPoint {
+public class GloryRanking {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,8 @@ public class GloryPoint {
 	private Player player;
 
     private Date lootDate;
+    private int glory;
+    private boolean eligibleForLoot;
     private int clanId;
     private String updatedBy;
     private Timestamp updatedTs;
@@ -43,6 +45,18 @@ public class GloryPoint {
 	public void setLootDate(Date lootDate) {
 		this.lootDate = lootDate;
 	}
+	public int getGlory() {
+		return glory;
+	}
+	public void setGlory(int glory) {
+		this.glory = glory;
+	}
+	public boolean isEligibleForLoot() {
+		return eligibleForLoot;
+	}
+	public void setEligibleForLoot(boolean eligibleForLoot) {
+		this.eligibleForLoot = eligibleForLoot;
+	}
 	public int getClanId() {
 		return clanId;
 	}
@@ -60,6 +74,15 @@ public class GloryPoint {
 	}
 	public void setUpdatedTs(Timestamp updatedTs) {
 		this.updatedTs = updatedTs;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		GloryRanking other = (GloryRanking) obj;
+		// TODO Auto-generated method stub
+		return this.glory == other.getGlory() 
+				&& this.player.getId().equals(other.getPlayer().getId())
+				&& this.isEligibleForLoot() == other.isEligibleForLoot();
 	}
 	
 }

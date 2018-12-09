@@ -11,6 +11,8 @@ public interface PlayerRepository extends CrudRepository<Player, Integer> {
     
     //public List<Player> findByEnabledOrderByNameAsc(boolean enabled);
     
-    public List<Player> findByEnabledAndLootEnabledOrderByGloryPointsDesc(boolean enabled, boolean lootEnabled);    
+    public List<Player> findByEnabledAndLootEnabledOrderByNameAsc(boolean enabled, boolean lootEnabled);    
+    
+    public List<Player> findByEnabledOrderByNameAsc(boolean enabled);
     
 }

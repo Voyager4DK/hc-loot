@@ -13,7 +13,6 @@ public class Player {
     private Integer id;
 
     private String name;
-    private int gloryPoints;
     private boolean lootEnabled;
     private boolean enabled;
     private String password;
@@ -36,14 +35,6 @@ public class Player {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public int getGloryPoints() {
-		return gloryPoints;
-	}
-
-	public void setGloryPoints(int gloryPoints) {
-		this.gloryPoints = gloryPoints;
 	}
 
 	public boolean isLootEnabled() {
