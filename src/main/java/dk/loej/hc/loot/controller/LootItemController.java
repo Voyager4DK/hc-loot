@@ -46,12 +46,12 @@ public class LootItemController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
     	//TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
     	
     	Date lastLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
         return StreamSupport
@@ -63,12 +63,12 @@ public class LootItemController {
     @GetMapping(value = "/for_player/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAllForPlayer(@PathVariable("playerId") Integer playerId) {
     	//TODO remove this again : Used for simulating slow load times!
-        try {
+        /*try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}    	
+		}*/    	
     	
     	Player player = playerRepository.findOne(playerId);
     	    	

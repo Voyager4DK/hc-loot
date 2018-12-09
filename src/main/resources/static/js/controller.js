@@ -141,6 +141,19 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
 			}
 		}*/
     }
+    
+    this.refreshFeatureToggles = function (scope) {   	
+    	scope.wishListDisabled = $rootScope.wishListDisabled;
+    	$http({
+            method: 'GET',
+            url: 'api/feature_toggle/WISH_LIST'
+        }).then(function successCallback(response) {
+            $rootScope.wishListDisabled = response.data;
+            scope.wishListDisabled = $rootScope.wishListDisabled;
+        }, function errorCallback(response) {
+            console.log(response.statusText);
+        });
+    }
 
     this.refreshLootItems = function (scope, lootItem) {
         scope.lootItems = $rootScope.lootItems;
@@ -213,6 +226,7 @@ app.controller("mainCtrl", function ($scope, $http, $rootScope, refreshPageData)
     }
 	
 	refreshPageData.refreshLootItems($scope);
+	refreshPageData.refreshFeatureToggles($scope);
 });
 
 app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {
@@ -497,14 +511,42 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
 
     // Initialize page with default data which is blank in this example
     $scope.wishItems = [];
-
+    
+    refreshPageData.refreshFeatureToggles($scope);
+    
+    if ($rootScope.loggedInPlayer.admin) {
+		$scope.admin = true;
+	} else {
+		$scope.admin = false;
+	}
+    
     // Now load the data from server
     if ($rootScope.loggedInPlayer.lootEnabled) {
-    	_refreshPageData();
-    } else {
+    	if (!$scope.wishListDisabled) {
+    		console.log("WishList disabled!");
+    		_refreshPageData();
+    	} else {
+    		console.log("WishList disabled!");
+    	}
+    } else {    	
     	$scope.lootDisabled = true;
     }
 
+    $scope.disableChanged = function() {
+    	console.log("disableChanged called!");
+    	$http({
+            method: "PUT",
+            url: "api/feature_toggle/WISH_LIST",
+            data: angular.toJson($scope.wishListDisabled),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function successCallback(response) {
+        	console.log("Success in updating WISH_LIST feature toggle");
+        }, function errorCallback(response) {
+        	console.error("Failure in updating WISH_LIST feature toggle");
+        });
+    }
     
     $scope.moveUp = function() {
     	var ids = $scope.selectedEnabledLootItemId;
@@ -560,12 +602,22 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
 
     /* Private Methods */
     // HTTP GET- get all lootItems collection
-    function _refreshPageData() {  	
+    function _refreshPageData() {
+    	if ($rootScope.wishItems) {
+    		$scope.disabledLootItems = $rootScope.disabledLootItems;
+    		$scope.wishItems = $rootScope.wishItems;
+    	}
+    	
+    	if ($scope.wishItems.length == 0) {
+        	$scope.loading = true;
+        }
+    	
     	$http({
             method: 'GET',
             url: 'api/loot_items/for_player/' + $rootScope.loggedInPlayer.id
         }).then(function successCallback(response) {
         	_splitLootItemData(response.data);
+        	$scope.loading = false;
         }, function errorCallback(response) {
             console.log(response.statusText);
         });
@@ -611,6 +663,8 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
 				$scope.wishItems[$scope.wishItems.length] = lootItems[i];
 			}
 		}
+    	$rootScope.disabledLootItems = $scope.disabledLootItems;
+    	$rootScope.wishItems = $scope.wishItems;
     }
     
     function _update(method, url, data, refresh) {

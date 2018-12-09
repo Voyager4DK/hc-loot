@@ -64,7 +64,7 @@ public class DistributionResultController {
         	List<LootItem> wishList = getWishList(players.get(i).getId(), lastLootDate);
         	for (LootItem wish : wishList) {
 				if (lootItemMap.containsKey(wish.getRowAndNum())) {
-					distributionResults.add(createDistributionResult(wish, players.get(i), lastLootDate, distributionResults.size()+1));
+					distributionResults.add(createDistributionResult(lootItemMap.get(wish.getRowAndNum()), players.get(i), lastLootDate, distributionResults.size()+1));
 					lootItemMap.remove(wish.getRowAndNum());
 					break;
 				}
@@ -79,11 +79,11 @@ public class DistributionResultController {
     	return distributionResults;
     }
 
-	private DistributionResult createDistributionResult(LootItem wish, Player player, Date lastLootDate, int resultIndex) {
+	private DistributionResult createDistributionResult(LootItem lootItem, Player player, Date lastLootDate, int resultIndex) {
 		DistributionResult distributionResult = new DistributionResult();
 		distributionResult.setGloryPoints(player.getGloryPoints());
 		distributionResult.setLootDate(lastLootDate);
-		distributionResult.setLootItem(wish);
+		distributionResult.setLootItem(lootItem);
 		distributionResult.setPlayer(player);
 		distributionResult.setOrderSequence(resultIndex);
 		

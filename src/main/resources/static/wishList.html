@@ -3,7 +3,12 @@
     <p align="center">
         For Clan war than ended on {{ lootItemProperties.lastLootDate }}.
     </p>
-	<table align="center" ng-hide="lootDisabled">
+    
+    <div ng-show="admin" align="center"><input type="checkbox" ng-model="wishListDisabled" ng-change="disableChanged()"> Disable wishList</div>
+    
+    <div ng-show="loading" align="center"><img src="image/loading-indicator.gif"></div>
+    
+    <table align="center" ng-hide="lootDisabled || loading || wishListDisabled">
 		<tr>
 			<th>&nbsp;</th>
 			<th>Yes please</th>
@@ -38,15 +43,17 @@
     	</tr>
     </table>
     <br>
-    <table align="center" ng-hide="lootDisabled">
+    <table align="center" ng-hide="lootDisabled || loading || wishListDisabled">
     	<tr>
     		<td>
     			<div align="left" ng-repeat="lootItem in wishItems">{{ lootItem.prioritySequence }}. {{ lootItem.rowAndNum }} {{ lootItem.name }} </div>
     		</td>
     	</tr>
-    </table>
+    </table>    
     
     <div ng-show="lootDisabled" style="color:red" align="center">Loot is currently disabled for your player!</div>
+    
+    <div ng-show="wishListDisabled" style="color:red" align="center">Wish list is currently not open!</div>
     
    
 </div>

@@ -1,6 +1,7 @@
 package dk.loej.hc.loot.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,9 @@ public class LootItem {
     private boolean disabled;
     private Integer playerId;
     private Date lootDate;
-    private int clan_id;    
+    private int clanId;
+    private Integer updatedBy;
+    private Timestamp updatedTs;
         
     public LootItem() {}
 
@@ -96,16 +99,30 @@ public class LootItem {
 
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
-	}
+	}	
 
 	public int getClanId() {
-		return clan_id;
+		return clanId;
 	}
 
-	public void setClanId(int clan_id) {
-		this.clan_id = clan_id;
-	}	
-	
-	
+	public void setClanId(int clanId) {
+		this.clanId = clanId;
+	}
+
+	public Integer getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(Integer updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Timestamp getUpdatedTs() {
+		return updatedTs;
+	}
+
+	public void setUpdatedTs(Timestamp updatedTs) {
+		this.updatedTs = updatedTs;
+	}
 
 }
