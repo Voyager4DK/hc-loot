@@ -16,12 +16,12 @@
             <div class="col-6"><input type="text" placeholder="GloryPoints" ng-model="form.gloryPoints" size="60"/></div>
         </div>
         <div class="row">
-            <div class="col-6"><label><input type="checkbox" ng-model="form.lootEnabled"> Can get and want loot</label></div>
+            <div class="col-6"><label><input type="checkbox" ng-model="form.lootEnabled"> I want loot</label></div>
         </div>
-        <div class="row" ng-show="admin">
+        <div class="row" ng-show="loggedInPlayer.admin">
             <div class="col-6"><label><input type="checkbox" ng-model="form.enabled"> Player is enabled</label></div>
         </div>
-        <div class="row" ng-show="admin">
+        <div class="row" ng-show="loggedInPlayer.admin">
             <div class="col-6"><label><input type="checkbox" ng-model="form.admin"> Player is Admin</label></div>
         </div>
         <input ng-disabled="saveDisabled" type="submit" value="Save"/>
@@ -32,13 +32,11 @@
     <table cellpadding="15">
         <tr class="table-row-cell">
             <th class="table-cell" align="left">Name</th>
-            <th class="table-cell">GloryPoints</th>
             <th class="table-cell">&nbsp;</th>
             <th class="table-cell">&nbsp;</th>
         </tr>
         <tr class="table-row-cell" ng-repeat="player in allPlayers">
             <td class="table-cell">{{ player.name }}</td>
-            <td class="table-cell">{{ player.gloryPoints }}</td>
             <td class="table-cell">
                 <a ng-show="loggedInPlayer.admin || player.id == loggedInPlayer.id" ng-click="edit( player )" class="btn">Edit</a>
                 <a ng-show="loggedInPlayer.admin" ng-click="remove( player )" class="btn">Remove</a>

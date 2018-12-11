@@ -238,9 +238,9 @@ app.controller("mainCtrl", function ($scope, $http, $rootScope, refreshPageData)
     if (!$rootScope.lootItems) {
     	$scope.loading = true;
     }
-	
-	refreshPageData.refreshLootItems($scope);
-	refreshPageData.refreshFeatureToggles($scope);
+    refreshPageData.refreshFeatureToggles($scope);
+    refreshPageData.refreshGloryRankings($scope);
+	refreshPageData.refreshLootItems($scope);	
 });
 
 app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {

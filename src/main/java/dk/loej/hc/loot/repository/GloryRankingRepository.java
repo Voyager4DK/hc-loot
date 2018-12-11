@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import dk.loej.hc.loot.entity.GloryRanking;
 
 public interface GloryRankingRepository extends CrudRepository<GloryRanking, Integer> {
-	public List<GloryRanking> findByLootDateOrderByGloryDesc(Date lootDate);
+	public List<GloryRanking> findByLootDateOrderByEligibleForLootDescGloryDesc(Date lootDate);
 	
 	public List<GloryRanking> findByLootDateAndEligibleForLootOrderByGloryDesc(Date lootDate, boolean eligibleForLoot);
 }

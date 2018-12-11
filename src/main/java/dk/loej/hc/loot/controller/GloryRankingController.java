@@ -44,30 +44,55 @@ public class GloryRankingController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List getAll() {
     	Date currentLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
-    	List<GloryRanking> gloryRankings = repository.findByLootDateOrderByGloryDesc(currentLootDate);
-    	if (gloryRankings.isEmpty()) {
-    		List<Player> players = playerRepository.findByEnabledOrderByNameAsc(true);
-    		for (Player player : players) {
-    			GloryRanking gloryRanking = new GloryRanking();
-    			gloryRanking.setClanId(1);
-    			gloryRanking.setEligibleForLoot(true);
-    			gloryRanking.setGlory(0);
-    			gloryRanking.setLootDate(currentLootDate);
-    			gloryRanking.setPlayer(player);
-    			gloryRanking.setUpdatedTs(Timestamp.valueOf(LocalDateTime.now()));
-    			gloryRankings.add(gloryRanking);
-			}
-    		repository.save(gloryRankings);
+    	List<GloryRanking> gloryRankings = repository.findByLootDateOrderByEligibleForLootDescGloryDesc(currentLootDate);
+    	
+    	List<Player> players = playerRepository.findByEnabledOrderByNameAsc(true);
+    	if (gloryRankings.isEmpty()) {    		
+    		gloryRankings = createAndPersistGloryRanksFromPlayers(currentLootDate, players);
+    	} else {
+    		gloryloop : for (GloryRanking gloryRanking : gloryRankings) {
+    			for (Player player : players) {
+    				if (gloryRanking.getPlayer().getId().equals(player.getId())) {
+    					players.remove(player);
+    					continue gloryloop;
+    				}    				
+    			}
+    			repository.delete(gloryRanking);    			
+    		}
+    		if (!players.isEmpty()) {
+    			gloryRankings.addAll(createAndPersistGloryRanksFromPlayers(currentLootDate, players));
+    		}
+    		gloryRankings = repository.findByLootDateOrderByEligibleForLootDescGloryDesc(currentLootDate);
     	}
     	return gloryRankings;
     }
+
+	private List<GloryRanking> createAndPersistGloryRanksFromPlayers(Date currentLootDate, List<Player> players) {
+		List<GloryRanking> gloryRankings = new ArrayList<>();
+		for (Player player : players) {
+			gloryRankings.add(createGloryRanking(currentLootDate, player));
+		}
+		repository.save(gloryRankings);
+		return gloryRankings;
+	}
+
+	private GloryRanking createGloryRanking(Date currentLootDate, Player player) {
+		GloryRanking gloryRanking = new GloryRanking();
+		gloryRanking.setClanId(1);
+		gloryRanking.setEligibleForLoot(true);
+		gloryRanking.setGlory(0);
+		gloryRanking.setLootDate(currentLootDate);
+		gloryRanking.setPlayer(player);
+		gloryRanking.setUpdatedTs(Timestamp.valueOf(LocalDateTime.now()));
+		return gloryRanking;
+	}
     
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void update(@RequestBody(required = false) List<GloryRanking> gloryRankings) {
     	Date currentLootDate = Date.valueOf(LootDateCalculator.getCurrentLootDate());
-    	List<GloryRanking> oldGloryRankings = repository.findByLootDateOrderByGloryDesc(currentLootDate);
+    	List<GloryRanking> oldGloryRankings = repository.findByLootDateOrderByEligibleForLootDescGloryDesc(currentLootDate);
     	List<GloryRanking> changedGloryRankings = new ArrayList<>();
 
 		for (int i=0; i<oldGloryRankings.size(); i++) {

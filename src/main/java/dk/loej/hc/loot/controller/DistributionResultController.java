@@ -63,7 +63,7 @@ public class DistributionResultController {
         deleteExistingDistributionsResults(currentLootDate);
         Map<String, LootItem> lootItemMap = getLootItemsMap(currentLootDate); 
         
-        List<GloryRanking> gloryRankings = gloryRankingRepository.findByLootDateAndEligibleForLootOrderByGloryDesc(currentLootDate, true);//playerRepository.findByEnabledAndLootEnabledOrderByGloryPointsDesc(true, true);
+        List<GloryRanking> gloryRankings = gloryRankingRepository.findByLootDateAndEligibleForLootOrderByGloryDesc(currentLootDate, true);
         gloryRankings = removePlayerThatDontWantLoot(gloryRankings);
         int i = 0;
         while (!lootItemMap.isEmpty()) {
