@@ -1,6 +1,30 @@
 var app = angular.module("mainApp", ["ngRoute"]);
 
-app.config(function($routeProvider) {
+app.factory('httpResponseErrorInterceptor', ['$injector', '$q', '$timeout', function($injector, $q, $timeout) {
+    var retryCount = 0;
+    return {
+        'responseError': function(response) {
+            if (retryCount == 5) {
+                retryCount = 0;
+            }
+            var now = new Date();
+            retryCount = retryCount+1;
+            var waitTime = 200*retryCount;
+
+            if (response.status === 0 || response.status === 504) {
+                return $timeout(function() {
+                    console.error(now.toLocaleTimeString() + ": http request failed with status " + response.status + " - retryCount=" + retryCount + ", waitTime=" + waitTime + "ms");
+                    var $http = $injector.get('$http');
+                    return $http(response.config);
+                }, waitTime);
+            }
+            return $q.reject(response);
+        }
+    };
+}]);
+
+app.config(function($routeProvider, $httpProvider) {
+    $httpProvider.interceptors.push('httpResponseErrorInterceptor');
 	$routeProvider
 	.when('/', {
 		templateUrl: 'login.html'
@@ -184,6 +208,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
         }, function errorCallback(response) {
             console.error(response.statusText);
         });
+
 
         $http({
             method: 'GET',
