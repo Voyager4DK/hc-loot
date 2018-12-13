@@ -11,7 +11,7 @@ app.factory('httpResponseErrorInterceptor', ['$injector', '$q', '$timeout', func
             retryCount = retryCount+1;
             var waitTime = 200*retryCount;
 
-            if (response.status === 0 || response.status === 504) {
+            if (response.status === 0 || response.status === 503 || response.status === 504) {
                 return $timeout(function() {
                     console.error(now.toLocaleTimeString() + ": http request failed with status " + response.status + " - retryCount=" + retryCount + ", waitTime=" + waitTime + "ms");
                     var $http = $injector.get('$http');
@@ -113,7 +113,7 @@ app.service('refreshPageData', ['$http', '$rootScope', function($http, $rootScop
     				var otherItem = lootItems[j+diff];
     				lootItem.prioritySequence = lootItem.prioritySequence + diff;
     				if (otherItem.prioritySequence == lootItem.prioritySequence) {
-    					console.log("otherItem.prioritySequence=" +otherItem.prioritySequence + ", lootItem.prioritySequence=" +lootItem.prioritySequence)
+    					//console.log("otherItem.prioritySequence=" +otherItem.prioritySequence + ", lootItem.prioritySequence=" +lootItem.prioritySequence)
     					otherItem.prioritySequence = otherItem.prioritySequence - diff;
         				lootItems[j+diff] = lootItem;
         				lootItems[j] = otherItem;
@@ -231,6 +231,8 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refre
     refreshPageData.refreshPlayers($scope);
     
 	$scope.login = function() {
+	    $scope.error = false;
+	    $scope.waiting = true;
 		var loginData = {
 			playerId: $scope.playerId,
 			password: "" + $scope.password
@@ -251,10 +253,11 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refre
         	$rootScope.loggedInPlayer = response.data;        	
         	console.log("Login success, window.location=" + window.location);
         	$location.path("/main");
+        	$scope.waiting = false;
         }, function errorCallback(error, statusText) {
         	$rootScope.loggedInPlayer = null;
-        	console.error("Login failed with error code: " + error.status); 
-        	alert("You failed to login!");
+        	$scope.waiting = false;
+        	$scope.error = "Login failed with errorCode: " + error.status;
         });
     }
 });
@@ -580,13 +583,42 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     // Now load the data from server
     if ($rootScope.loggedInPlayer.lootEnabled) {
     	if (!$scope.wishListDisabled) {
-    		console.log("WishList disabled!");
     		_refreshPageData();
     	} else {
     		console.log("WishList disabled!");
     	}
     } else {    	
     	$scope.lootDisabled = true;
+    }
+    
+    $scope.save = function() {
+    	var data = [];
+    	$scope.saving=true;
+    	$scope.error="";
+    	for (var i=0; i<$scope.wishItems.length; i++) {
+    		$scope.wishItems[i].disabled = false;
+    		data[data.length] = $scope.wishItems[i];
+    	}
+    	for (var i=0; i<$scope.disabledLootItems.length; i++) {
+    		$scope.disabledLootItems[i].disabled = true;
+    		data[data.length] = $scope.disabledLootItems[i];
+    	}
+    	
+    	$http({
+            method: "PUT",
+            url: "api/loot_items/update_wishlist",
+            data: angular.toJson(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function successCallback(response) {
+        	console.log("Success in saving wish list");
+        	$scope.saving=false;
+        }, function errorCallback(response) {
+        	console.error("Failure in saving wish list");
+        	$scope.saving=false;
+        	$scope.error="Failed to save wish list, try again";
+        });
     }
 
     $scope.disableChanged = function() {
@@ -608,13 +640,9 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     $scope.moveUp = function() {
     	var ids = $scope.selectedEnabledLootItemId;
         for (i = 0; i < ids.length; i++) {
-    		console.log("ids[" + i + "]=" + ids[i]);
+    		//console.log("ids[" + i + "]=" + ids[i]);
         	if (ids[i].length > 0) {
-        		var method = "PUT";
-        		var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-        		if (refreshPageData.quickMoveLootItem(ids[i], -1, $scope.wishItems)) {
-        			_update(method, url, -1);
-        		}
+        		refreshPageData.quickMoveLootItem(ids[i], -1, $scope.wishItems);
         	}
         }
     };
@@ -622,11 +650,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     $scope.moveDown = function() {
     	var ids = $scope.selectedEnabledLootItemId;
         for (i = 0; i < ids.length; i++) {        	
-        	var method = "PUT";
-            var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            if (refreshPageData.quickMoveLootItem(ids[i], 1, $scope.wishItems)) {
-            	_update(method, url, 1)
-            }
+        	refreshPageData.quickMoveLootItem(ids[i], 1, $scope.wishItems);
         }
     };
     
@@ -636,10 +660,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     		ids = $scope.selectedEnabledLootItemId;
     	}
         for (i = 0; i < ids.length; i++) {        	
-        	var method = "PUT";
-            var url = 'api/loot_items/' + ids[i] + "/toggle";
-            _quickToggle(ids[i], disabled);
-            _update(method, url, disabled)
+        	_quickToggle(ids[i], disabled);
         }
     };
     

@@ -37,9 +37,8 @@
     	</tr>
     	<tr>
     		<td>&nbsp;</td>
+    		<td colspan="2"><a ng-click="save()" class="btn">Save</a> &nbsp;<span ng-show="saving" style="color: red">Waiting for confirmation</span><span ng-show="error" style="color: red">{{ error }}</span></td>
     		<td><a ng-click="reset()" class="btn">Reset</a></td>
-    		<td>&nbsp;</td>
-    		<td>&nbsp;</td>
     	</tr>
     </table>
     <br>

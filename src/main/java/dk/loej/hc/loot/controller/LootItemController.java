@@ -149,6 +149,27 @@ public class LootItemController {
         lootItem.setId(id);
         return repository.save(lootItem);
     }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/update_wishlist", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void updateWishList(@RequestBody(required = false) List<LootItem> lootItems) {
+        /*for (LootItem lootItem : lootItems) {
+			System.out.println("id=" + lootItem.getId() + ", name=" + lootItem.getName() + ", seq=" + lootItem.getPrioritySequence() + ", playerId=" + lootItem.getPlayerId() + ", disabled=" + lootItem.isDisabled());
+		}*/
+		
+    	//TODO remove this again : Used for simulating slow load times!
+        /*try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+        
+        repository.save(lootItems);
+        //return getAllForPlayer(lootItems.get(0).getPlayerId());
+        
+    }
     
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
@@ -188,8 +209,7 @@ public class LootItemController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}/toggle", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public List toggle(@PathVariable("id") Integer id, @RequestBody(required = false) boolean disabled) {
-        System.out.println("toggle, id=" + id + ", disabled=" + disabled);
-    	verifyLootItemExists(id);
+        verifyLootItemExists(id);
         LootItem lootItem = repository.findOne(id);        
         lootItem.setDisabled(disabled);
         

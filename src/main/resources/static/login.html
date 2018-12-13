@@ -27,7 +27,9 @@
                 </div>
             </div>
 
-            <input type="submit" value="Login"/>
+            <input type="submit" value="Login"/> &nbsp; 
+            <span ng-show="waiting" style="color: red">Waiting for response...</span>
+            <span ng-show="error" style="color: red">{{ error }}</span></td>
         </form>
     </div>
 </div>
