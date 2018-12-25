@@ -262,13 +262,18 @@ app.controller('loginCtrl', function($scope, $http, $location, $rootScope, refre
     }
 });
 
-app.controller("mainCtrl", function ($scope, $http, $rootScope, refreshPageData) {
+app.controller("mainCtrl", function ($scope, $http, $rootScope, $location, refreshPageData) {
     if (!$rootScope.lootItems) {
     	$scope.loading = true;
     }
     refreshPageData.refreshFeatureToggles($scope);
     refreshPageData.refreshGloryRankings($scope);
 	refreshPageData.refreshLootItems($scope);	
+	
+	$scope.logOut = function () {
+		$rootScope.loggedInPlayer = "";
+		$location.path("/");
+	}
 });
 
 app.controller("playerManagementCtrl", function ($scope, $http, $rootScope, refreshPageData) {
