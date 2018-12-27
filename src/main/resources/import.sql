@@ -114,8 +114,8 @@ insert into glory_ranking (loot_date, eligible_for_loot, clan_id, updated_by, up
 
 
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A1', 'Legendary bow level 40', 1, true, false, false, null, '2018-12-25', 1);
-insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B1', 'Legendary armor level 62', 2, true, false, false, null, '2018-12-25', 1);
-insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A2', 'Legendary armor level 92', 3, true, false, false, null, '2018-12-25', 1);
+insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B1', 'Legendary Archer armor level 62', 2, true, false, false, null, '2018-12-25', 1);
+insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A2', 'Legendary Archer armor level 92', 3, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A11', '2 purple shards', 4, true, true, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B11', '2 purple shards', 5, true, true, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A12', '2 purple shards', 6, true, true, false, null, '2018-12-25', 1);
@@ -146,7 +146,7 @@ insert into loot_item (row_and_num, name, priority_sequence, original, common, d
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A7', 'Rare tank armor level 54', 31, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B7', 'Rare amulet level 75', 32, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A8', 'Rare mage armor level 36', 33, true, false, false, null, '2018-12-25', 1);
-insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B8', 'Rare crossbob level 70', 34, true, false, false, null, '2018-12-25', 1);
+insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B8', 'Rare crossbow level 70', 34, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A9', 'Rare amulet level 67', 35, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('B9', 'Rare ring level 62', 36, true, false, false, null, '2018-12-25', 1);
 insert into loot_item (row_and_num, name, priority_sequence, original, common, disabled, player_id, loot_date, clan_id) values ('A14', '4 green shards', 37, true, true, false, null, '2018-12-25', 1);
