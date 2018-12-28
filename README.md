@@ -27,6 +27,13 @@ oc rollout status dc/hc-loot
 cd /data
 pg_dump my_data | gzip > backup/my_data.gz
 
+# Linux db create
+sudo -u postgres createuser --superuser [login name]
+sudo -u postgres psql
+create role hcloot LOGIN PASSWORD 'secret';
+export DB_USERNAME=
+export DB_PASSWORD=
+
 #Url:
 	https://bit.ly/2BcYDYs
 	http://hc-loot-voyager4dk.7e14.starter-us-west-2.openshiftapps.com/
