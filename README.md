@@ -31,6 +31,7 @@ pg_dump my_data | gzip > backup/my_data.gz
 sudo -u postgres createuser --superuser [login name]
 sudo -u postgres psql
 create role hcloot LOGIN PASSWORD 'secret';
+CREATE DATABASE hcloot_db WITH OWNER hcloot;
 export DB_USERNAME=
 export DB_PASSWORD=
 
