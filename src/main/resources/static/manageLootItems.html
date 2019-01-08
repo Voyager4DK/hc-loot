@@ -39,5 +39,6 @@
     <div class="row">
         <a ng-click="edit()" class="btn">Modify</a>
         <a ng-click="remove()" class="btn">Remove</a>
+        <a ng-click="save()" class="btn">Save</a> &nbsp;<span ng-show="saving" style="color: red">Waiting for confirmation</span><span ng-show="error" style="color: red">{{ error }}</span>
     </div>
 </div>

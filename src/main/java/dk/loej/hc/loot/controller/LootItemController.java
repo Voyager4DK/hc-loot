@@ -152,11 +152,11 @@ public class LootItemController {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = "/update_wishlist", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateWishList(@RequestBody(required = false) List<LootItem> lootItems) {
-        /*for (LootItem lootItem : lootItems) {
+        for (LootItem lootItem : lootItems) {
 			System.out.println("id=" + lootItem.getId() + ", name=" + lootItem.getName() + ", seq=" + lootItem.getPrioritySequence() + ", playerId=" + lootItem.getPlayerId() + ", disabled=" + lootItem.isDisabled());
-		}*/
+		}
 		
     	//TODO remove this again : Used for simulating slow load times!
         /*try {

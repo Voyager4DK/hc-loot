@@ -491,26 +491,44 @@ app.controller("lootItemManagementCtrl", function ($scope, $http, $rootScope, re
 
     };
     
+    $scope.save = function() {
+    	var data = [];
+    	$scope.saving = true;
+    	$scope.error = "";
+    	    	
+    	$http({
+            method: "PUT",
+            url: "api/loot_items/update",
+            data: angular.toJson($scope.lootItems),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function successCallback(response) {
+        	console.log("Success in saving loot items");
+        	$scope.saving=false;
+        }, function errorCallback(response) {
+        	console.error("Failure in saving loot items");
+        	$scope.saving=false;
+        	$scope.error="Failed to save loot items, try again";
+        });
+    }
+    
+    
+    
     $scope.moveUp = function() {
     	var ids = $scope.selectedLootItemId;
         for (i = 0; i < ids.length; i++) {
-    		var method = "PUT";
-            var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            if (refreshPageData.quickMoveLootItem(ids[i], -1, $scope.lootItems)) {
-            	_update(method, url, -1);
-            }            
+    		//console.log("ids[" + i + "]=" + ids[i]);
+        	if (ids[i].length > 0) {
+        		refreshPageData.quickMoveLootItem(ids[i], -1, $scope.lootItems);
+        	}
         }
     };
     
     $scope.moveDown = function() {
     	var ids = $scope.selectedLootItemId;
         for (i = 0; i < ids.length; i++) {        	
-        	var method = "PUT";
-            var url = 'api/loot_items/' + ids[i] + "/change_sequence";
-            if (refreshPageData.quickMoveLootItem(ids[i], 1, $scope.lootItems)) {
-            	_update(method, url, 1);
-            }
-            
+        	refreshPageData.quickMoveLootItem(ids[i], 1, $scope.lootItems);
         }
     };
 
@@ -611,7 +629,7 @@ app.controller("wishListCtrl", function ($scope, $http, $rootScope, refreshPageD
     	
     	$http({
             method: "PUT",
-            url: "api/loot_items/update_wishlist",
+            url: "api/loot_items/update",
             data: angular.toJson(data),
             headers: {
                 'Content-Type': 'application/json'
